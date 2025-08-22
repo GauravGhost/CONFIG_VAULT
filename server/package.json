@@ -4,9 +4,9 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "dev": "tsc && node dist/server.js",
     "build": "tsc",
-    "start": "node dist/server.js",
+    "start": "dotenvx run --env-file=.env.production -- node dist/server.js",
+    "dev": "dotenvx run --env-file=.env.development -- nodemon --exec 'node --loader ts-node/esm' src/server.ts",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [],
@@ -15,9 +15,22 @@
   "type": "module",
   "dependencies": {
     "@config-vault/shared": "*",
-    "express": "^5.1.0"
+    "@dotenvx/dotenvx": "^1.49.0",
+    "bcrypt": "^6.0.0",
+    "cors": "^2.8.5",
+    "express": "^5.1.0",
+    "express-rate-limit": "^8.0.1",
+    "helmet": "^8.1.0",
+    "jsonwebtoken": "^9.0.2",
+    "sqlite": "^5.1.1",
+    "sqlite3": "^5.1.7"
   },
   "devDependencies": {
-    "@types/express": "^5.0.3"
+    "@types/bcrypt": "^6.0.0",
+    "@types/express": "^5.0.3",
+    "@types/jsonwebtoken": "^9.0.10",
+    "@types/node": "^24.3.0",
+    "nodemon": "^3.1.10",
+    "ts-node": "^10.9.2"
   }
 }
