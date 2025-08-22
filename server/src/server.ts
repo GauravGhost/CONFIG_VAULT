@@ -1,7 +1,22 @@
 import express from "express";
-
+import cors from 'cors';
+import helmet from 'helmet';
+import rateLimit from 'express-rate-limit';
+import { SERVER_CONFIG } from "./config/server-config.js";
+import { init } from "./lib/initialize.js";
 const app = express();
 
-app.listen(4000, () => {
-    console.log("Server is running on port 4000");
+app.use(helmet());
+app.use(cors());
+app.use(express.json({ limit: '10mb' }));
+app.use(rateLimit({
+  windowMs: 15 * 60 * 1000,
+  max: 100 
+}));
+
+
+
+app.listen(SERVER_CONFIG.APP_PORT, async () => {
+    await init();
+    console.log(`Server is running on port ${SERVER_CONFIG.APP_PORT}`);
 });
