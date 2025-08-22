@@ -36,3 +36,8 @@ coverage/
 # Misc
 *.tgz
 *.gz
+
+# App Specific
+/data
+.env.development
+.env.production
