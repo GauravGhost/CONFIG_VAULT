@@ -1,0 +1,156 @@
+# Node.js
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+.env
+.env.local
+.env.*.local
+
+# Build output
+dist/
+build/
+tmp/
+temp/
+out/
+coverage/
+.next/
+.vercel/
+.svelte-kit/
+.snowpack/
+.solid/
+.solid-start/
+.solid-build/
+.solid-server/
+.solid-client/
+.solid-static/
+.solid-public/
+.solid-assets/
+.solid-dist/
+.solid-out/
+.solid-coverage/
+.solid-temp/
+.solid-tmp/
+.solid-debug/
+.solid-error/
+.solid-log/
+.solid-yarn/
+.solid-pnpm/
+.solid-npm/
+.solid-env/
+.solid-env.local/
+.solid-env.*.local/
+.solid-env.production/
+.solid-env.development/
+.solid-env.test/
+.solid-env.staging/
+.solid-env.ci/
+.solid-env.build/
+.solid-env.dist/
+.solid-env.out/
+.solid-env.coverage/
+.solid-env.next/
+.solid-env.vercel/
+.solid-env.svelte-kit/
+.solid-env.snowpack/
+.solid-env.solid/
+.solid-env.solid-start/
+.solid-env.solid-build/
+.solid-env.solid-server/
+.solid-env.solid-client/
+.solid-env.solid-static/
+.solid-env.solid-public/
+.solid-env.solid-assets/
+.solid-env.solid-dist/
+.solid-env.solid-out/
+.solid-env.solid-coverage/
+.solid-env.solid-temp/
+.solid-env.solid-tmp/
+.solid-env.solid-debug/
+.solid-env.solid-error/
+.solid-env.solid-log/
+.solid-env.solid-yarn/
+.solid-env.solid-pnpm/
+.solid-env.solid-npm/
+
+# Logs
+logs/
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# OS
+.DS_Store
+Thumbs.db
+
+# IDEs
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Test
+coverage/
+*.lcov
+
+# Misc
+*.tgz
+*.gz
+*.zip
+
+# TypeScript
+*.tsbuildinfo
+
+# React Native
+.expo/
+*.expo/
+*.expo-shared/
+
+# Next.js
+.next/
+out/
+
+# Svelte
+.svelte-kit/
+
+# Storybook
+.storybook-static/
+
+# Others
+*.sqlite
+*.db
+*.sqlite3
+*.bak
+*.pid
+*.seed
+*.dump
+
+# Docker
+docker-compose.override.yml
+.docker/
+
+# PM2
+.pm2/
+
+# Prisma
+prisma/migrations/
+
+# Parcel
+.cache/
+.parcel-cache/
+
+# Mac
+*.DS_Store
+
+# Windows
+Thumbs.db
+
+# Linux
+*~
+
+# Yarn
+.yarn/
+.pnp.*
