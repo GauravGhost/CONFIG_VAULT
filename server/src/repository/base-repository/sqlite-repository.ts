@@ -250,6 +250,12 @@ export class SQLiteRepository<T extends BaseModel> implements IRepository<T> {
         return this.db.get(query, params);
     }
 
+    // Execute database schema (CREATE TABLE statements)
+    async executeSchema(schema: string): Promise<void> {
+        if (!this.db) throw new Error('Database not initialized');
+        await this.db.exec(schema);
+    }
+
     // Close database connection
     static async closeConnection(): Promise<void> {
         if (SQLiteRepository.dbInstance) {
