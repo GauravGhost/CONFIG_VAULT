@@ -5,8 +5,8 @@
   "main": "index.js",
   "scripts": {
     "build": "tsc",
-    "start": "dotenvx run --env-file=.env.production -- node dist/server.js",
-    "dev": "dotenvx run --env-file=.env.development -- nodemon --exec 'node --loader ts-node/esm' src/server.ts",
+    "start": "npx dotenvx run --env-file=.env.production -- node dist/server.js",
+    "dev": "npx dotenvx run --env-file=.env.development -- nodemon --exec \"node --loader ts-node/esm\" src/server.ts",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [],
