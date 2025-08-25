@@ -2,8 +2,8 @@ import sqlite3 from 'sqlite3';
 import { Database, open } from 'sqlite';
 import { mkdir } from 'fs/promises';
 import { dirname } from 'path';
-import type { BaseModel, CreateItem, IRepository } from './types.js';
 import { QueryBuilder } from './query-builder.js';
+import type { BaseModel, CreateItem, IRepository } from '@config-vault/shared';
 
 export class SQLiteRepository<T extends BaseModel> implements IRepository<T> {
     protected db: Database | null = null;
