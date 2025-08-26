@@ -1,3 +1,5 @@
+import type { User } from "@config-vault/shared";
+
 export interface BaseResponse {
     success: boolean;
     message: string;
@@ -18,3 +20,12 @@ export interface ErrorResponse extends BaseResponse {
 }
 
 export type ApiResponse<T = any> = SuccessResponse<T> | ErrorResponse;
+
+// Extend Express Request type to include user property
+declare global {
+    namespace Express {
+        interface Request {
+            user?: User;
+        }
+    }
+}

@@ -3,4 +3,5 @@ export const SERVER_CONFIG = {
     APP_PORT: process.env.APP_PORT || 4000,
     DB_PATH: process.env.DB_PATH || 'data/database.sqlite',
     NODE_ENV: process.env.NODE_ENV || 'development',
+    JWT_SECRET: process.env.JWT_SECRET || 'your_jwt_secret',
 }
