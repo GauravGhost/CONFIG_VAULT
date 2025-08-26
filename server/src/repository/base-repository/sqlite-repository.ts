@@ -12,6 +12,25 @@ export class SQLiteRepository<T extends BaseModel> implements IRepository<T> {
 
     constructor(tableName: string) {
         this.tableName = tableName;
+        // Auto-connect to singleton if already initialized
+        this.connectToSingleton();
+    }
+
+    // Connect to singleton database if available
+    private connectToSingleton(): void {
+        if (SQLiteRepository.dbInstance && !this.db) {
+            this.db = SQLiteRepository.dbInstance;
+        }
+    }
+
+    // Ensure database connection before operations
+    private ensureDbConnection(): void {
+        if (!this.db) {
+            this.connectToSingleton();
+        }
+        if (!this.db) {
+            throw new Error('Database not initialized');
+        }
     }
 
     // Singleton database connection
@@ -33,18 +52,18 @@ export class SQLiteRepository<T extends BaseModel> implements IRepository<T> {
     }
 
     async create(item: CreateItem<T>): Promise<T> {
-        if (!this.db) throw new Error('Database not initialized');
+        this.ensureDbConnection();
 
         const columns = Object.keys(item);
         const values = Object.values(item);
         const placeholders = new Array(values.length).fill('?').join(', ');
 
-        const result = await this.db.run(
+        const result = await this.db!.run(
             `INSERT INTO ${this.tableName} (${columns.join(', ')}) VALUES (${placeholders})`,
             values
         );
 
-        const insertedRecord = await this.db.get(
+        const insertedRecord = await this.db!.get(
             `SELECT * FROM ${this.tableName} WHERE rowid = ?`,
             [result.lastID]
         );
@@ -57,9 +76,9 @@ export class SQLiteRepository<T extends BaseModel> implements IRepository<T> {
     }
 
     async findById(id: string): Promise<T | null> {
-        if (!this.db) throw new Error('Database not initialized');
+        this.ensureDbConnection();
 
-        const result = await this.db.get(
+        const result = await this.db!.get(
             `SELECT * FROM ${this.tableName} WHERE id = ?`,
             [id]
         );
@@ -68,7 +87,7 @@ export class SQLiteRepository<T extends BaseModel> implements IRepository<T> {
     }
 
     async findAll(limit?: number, offset: number = 0): Promise<T[]> {
-        if (!this.db) throw new Error('Database not initialized');
+        this.ensureDbConnection();
 
         let query = `SELECT * FROM ${this.tableName} ORDER BY created_at DESC`;
         const params: any[] = [];
@@ -78,12 +97,12 @@ export class SQLiteRepository<T extends BaseModel> implements IRepository<T> {
             params.push(limit, offset);
         }
 
-        const results = await this.db.all(query, params);
+        const results = await this.db!.all(query, params);
         return results as T[];
     }
 
     async findBy(criteria: Partial<T>, limit?: number, offset: number = 0): Promise<T[]> {
-        if (!this.db) throw new Error('Database not initialized');
+        this.ensureDbConnection();
 
         const { clause, values } = QueryBuilder.buildWhereClause(criteria as Record<string, any>);
         let query = `SELECT * FROM ${this.tableName} ${clause} ORDER BY created_at DESC`;
@@ -94,22 +113,22 @@ export class SQLiteRepository<T extends BaseModel> implements IRepository<T> {
             params.push(limit, offset);
         }
 
-        const results = await this.db.all(query, params);
+        const results = await this.db!.all(query, params);
         return results as T[];
     }
 
     async findOne(criteria: Partial<T>): Promise<T | null> {
-        if (!this.db) throw new Error('Database not initialized');
+        this.ensureDbConnection();
 
         const { clause, values } = QueryBuilder.buildWhereClause(criteria as Record<string, any>);
         const query = `SELECT * FROM ${this.tableName} ${clause} LIMIT 1`;
 
-        const result = await this.db.get(query, values);
+        const result = await this.db!.get(query, values);
         return result as T || null;
     }
 
     async update(id: string, item: Partial<CreateItem<T>>): Promise<T> {
-        if (!this.db) throw new Error('Database not initialized');
+        this.ensureDbConnection();
 
         const { clause, values } = QueryBuilder.buildUpdateClause(item as Record<string, any>);
         
@@ -117,7 +136,7 @@ export class SQLiteRepository<T extends BaseModel> implements IRepository<T> {
             throw new Error('No fields to update');
         }
 
-        await this.db.run(
+        await this.db!.run(
             `UPDATE ${this.tableName} SET ${clause} WHERE id = ?`,
             [...values, id]
         );
@@ -131,9 +150,9 @@ export class SQLiteRepository<T extends BaseModel> implements IRepository<T> {
     }
 
     async delete(id: string): Promise<boolean> {
-        if (!this.db) throw new Error('Database not initialized');
+        this.ensureDbConnection();
 
-        const result = await this.db.run(
+        const result = await this.db!.run(
             `DELETE FROM ${this.tableName} WHERE id = ?`,
             [id]
         );
@@ -142,7 +161,7 @@ export class SQLiteRepository<T extends BaseModel> implements IRepository<T> {
     }
 
     async count(criteria?: Partial<T>): Promise<number> {
-        if (!this.db) throw new Error('Database not initialized');
+        this.ensureDbConnection();
 
         let query = `SELECT COUNT(*) as count FROM ${this.tableName}`;
         let values: any[] = [];
@@ -153,14 +172,14 @@ export class SQLiteRepository<T extends BaseModel> implements IRepository<T> {
             values = whereValues;
         }
 
-        const result = await this.db.get(query, values);
+        const result = await this.db!.get(query, values);
         return result?.count || 0;
     }
 
     async exists(id: string): Promise<boolean> {
-        if (!this.db) throw new Error('Database not initialized');
+        this.ensureDbConnection();
 
-        const result = await this.db.get(
+        const result = await this.db!.get(
             `SELECT 1 FROM ${this.tableName} WHERE id = ? LIMIT 1`,
             [id]
         );
@@ -169,20 +188,20 @@ export class SQLiteRepository<T extends BaseModel> implements IRepository<T> {
     }
 
     async createMany(items: CreateItem<T>[]): Promise<T[]> {
-        if (!this.db) throw new Error('Database not initialized');
+        this.ensureDbConnection();
         if (items.length === 0) return [];
 
         const results: T[] = [];
         
-        await this.db.exec('BEGIN TRANSACTION');
+        await this.db!.exec('BEGIN TRANSACTION');
         try {
             for (const item of items) {
                 const created = await this.create(item);
                 results.push(created);
             }
-            await this.db.exec('COMMIT');
+            await this.db!.exec('COMMIT');
         } catch (error) {
-            await this.db.exec('ROLLBACK');
+            await this.db!.exec('ROLLBACK');
             throw error;
         }
 
@@ -190,7 +209,7 @@ export class SQLiteRepository<T extends BaseModel> implements IRepository<T> {
     }
 
     async updateMany(criteria: Partial<T>, item: Partial<CreateItem<T>>): Promise<number> {
-        if (!this.db) throw new Error('Database not initialized');
+        this.ensureDbConnection();
 
         const { clause: whereClause, values: whereValues } = QueryBuilder.buildWhereClause(criteria as Record<string, any>);
         const { clause: setClause, values: setValues } = QueryBuilder.buildUpdateClause(item as Record<string, any>);
@@ -199,7 +218,7 @@ export class SQLiteRepository<T extends BaseModel> implements IRepository<T> {
             throw new Error('No fields to update');
         }
 
-        const result = await this.db.run(
+        const result = await this.db!.run(
             `UPDATE ${this.tableName} SET ${setClause} ${whereClause}`,
             [...setValues, ...whereValues]
         );
@@ -208,7 +227,7 @@ export class SQLiteRepository<T extends BaseModel> implements IRepository<T> {
     }
 
     async deleteMany(criteria: Partial<T>): Promise<number> {
-        if (!this.db) throw new Error('Database not initialized');
+        this.ensureDbConnection();
 
         const { clause, values } = QueryBuilder.buildWhereClause(criteria as Record<string, any>);
         
@@ -216,7 +235,7 @@ export class SQLiteRepository<T extends BaseModel> implements IRepository<T> {
             throw new Error('Cannot delete all records without criteria');
         }
 
-        const result = await this.db.run(
+        const result = await this.db!.run(
             `DELETE FROM ${this.tableName} ${clause}`,
             values
         );
@@ -226,34 +245,34 @@ export class SQLiteRepository<T extends BaseModel> implements IRepository<T> {
 
     // Transaction
     async transaction<R>(callback: (repo: SQLiteRepository<T>) => Promise<R>): Promise<R> {
-        if (!this.db) throw new Error('Database not initialized');
+        this.ensureDbConnection();
 
-        await this.db.exec('BEGIN TRANSACTION');
+        await this.db!.exec('BEGIN TRANSACTION');
         try {
             const result = await callback(this);
-            await this.db.exec('COMMIT');
+            await this.db!.exec('COMMIT');
             return result;
         } catch (error) {
-            await this.db.exec('ROLLBACK');
+            await this.db!.exec('ROLLBACK');
             throw error;
         }
     }
 
     // Raw query
     async rawQuery(query: string, params: any[] = []): Promise<any[]> {
-        if (!this.db) throw new Error('Database not initialized');
-        return this.db.all(query, params);
+        this.ensureDbConnection();
+        return this.db!.all(query, params);
     }
 
     async rawGet(query: string, params: any[] = []): Promise<any> {
-        if (!this.db) throw new Error('Database not initialized');
-        return this.db.get(query, params);
+        this.ensureDbConnection();
+        return this.db!.get(query, params);
     }
 
     // Execute database schema (CREATE TABLE statements)
     async executeSchema(schema: string): Promise<void> {
-        if (!this.db) throw new Error('Database not initialized');
-        await this.db.exec(schema);
+        this.ensureDbConnection();
+        await this.db!.exec(schema);
     }
 
     // Close database connection
