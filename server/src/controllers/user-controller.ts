@@ -46,6 +46,24 @@ class UserController {
             successResponse.data = userResponse;
             res.status(200).json(successResponse);
     };
+
+     public getProfile = async (req: Request, res: Response): Promise<void> => {
+            const user = req.user;
+
+            if (!user?.id) {
+                res.status(400).json({
+                    success: false,
+                    message: 'User ID is required'
+                });
+                return;
+            }
+
+            const response = await this.userService.getUserById(user.id);
+
+            const { password, ...userResponse } = response;
+            successResponse.data = userResponse;
+            res.status(200).json(successResponse);
+    };
     
 
     public updateUser = async (req: Request, res: Response): Promise<void> => {
