@@ -4,6 +4,8 @@ import helmet from 'helmet';
 import rateLimit from 'express-rate-limit';
 import { SERVER_CONFIG } from "./config/server-config.js";
 import { init } from "./lib/initialize.js";
+import routes from "./routes/index.js";
+
 const app = express();
 
 app.use(helmet());
@@ -13,6 +15,9 @@ app.use(rateLimit({
   windowMs: 15 * 60 * 1000,
   max: 100 
 }));
+
+// API routes
+app.use('/api', routes);
 
 
 
