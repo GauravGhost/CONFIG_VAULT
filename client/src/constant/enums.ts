@@ -1,6 +1,6 @@
 export const storageKeys = {
     LANGUAGE: 'language',
-    TOKEN: "token"
+    AUTH_TOKEN: "auth-token"
 } as const;
 
 export type StorageKey = keyof typeof storageKeys;
