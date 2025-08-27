@@ -1,4 +1,5 @@
 import type { IconName } from "@/components/ui/icon";
+import { dashboardConfig } from "@/constant/page-config/dashboard-config";
 
 interface MenuItem {
     title: string;
@@ -11,9 +12,9 @@ interface MenuItem {
 
 export const sidebarItems: MenuItem[] = [
     {
-        title: "Dashboard",
-        url: "/",
-        icon: "LayoutDashboard",
+        title: dashboardConfig.name,
+        url: dashboardConfig.path,
+        icon: dashboardConfig.icon,
         isActive: true,
     },
 ];

@@ -7,6 +7,7 @@ export const dashboardConfig: PageConfig = {
     name: "Dashboard",
     icon: "LayoutDashboard",
     path: "/",
+    isActive: true,
     breadcrumb: [
         sidebarBaseBreadcrumb,
     ]

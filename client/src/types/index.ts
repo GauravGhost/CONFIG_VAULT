@@ -3,7 +3,8 @@ import type { IconName } from "@/components/ui/icon";
 
 export interface PageConfig {
     name: string;
-    icon: IconName;
+    icon?: IconName;
     path: string;
+    isActive?: boolean;
     breadcrumb: BreadcrumbData[];
 }

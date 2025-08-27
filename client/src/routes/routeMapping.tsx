@@ -2,6 +2,7 @@
 import { ErrorBoundary } from "@/components/core/ErrorBoundary";
 import { PublicOnlyRoute } from "@/components/core/wrapper/PublicRouteWrapper";
 import AuthorizedLayout from "@/components/layout/AuthorizedLayout";
+import { dashboardConfig } from "@/constant/page-config/dashboard-config";
 import Dashboard from "@/pages/dashboard/Dashboard";
 import Login from "@/pages/login/Login";
 import type { RouteObject } from "react-router";
@@ -20,8 +21,8 @@ export const routeMapping: RouteObjectExtend[] = [
     element: <AuthorizedLayout />,
     children: [
       {
-        title: "Dashboard",
-        path: "",
+        title: dashboardConfig.name,
+        path: dashboardConfig.path,
         element: <Dashboard />,
       }
     ],
