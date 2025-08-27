@@ -1,0 +1,365 @@
+import * as React from "react"
+import { zodResolver } from "@hookform/resolvers/zod"
+import { useForm, type ControllerRenderProps, type Path, type UseFormReturn, type FieldValues } from "react-hook-form"
+import { z } from "zod"
+import {
+    Form,
+    FormControl,
+    FormDescription,
+    FormField,
+    FormItem,
+    FormLabel,
+    FormMessage,
+} from "./form"
+import { Button } from "./button"
+import { type IconName } from "./icon"
+import { cn } from "@/lib/utils"
+import MilestoneStepIndicator from "./my-form/MilestoneStepIndicator"
+import DefaultStepIndicator from "./my-form/DefaultStepIndicator"
+import ProgressStepIndicator from "./my-form/ProgressStepIndicator"
+import BreadcrumbStepIndicator from "./my-form/BreadcrumbStepIndicator"
+import DotsStepIndicator from "./my-form/DotStepIndicator"
+import ArrayField from "./my-form/ArrayField"
+import { getGridCols } from "./my-form/formUtils."
+
+export interface FormFieldItem<T extends z.ZodTypeAny> {
+    label: string;
+    name: Path<z.infer<T>>;
+    description?: string;
+    layout?: {
+        row: number;
+        width?: "full" | "1/2" | "1/3" | "2/3" | "1/4" | "3/4";
+    };
+    render: (props: {
+        field: ControllerRenderProps<z.infer<T>, Path<z.infer<T>>>;
+        form: UseFormReturn<z.infer<T>>;
+        index?: number;
+    }) => React.ReactNode;
+    preview?: (props: {
+        field: ControllerRenderProps<z.infer<T>, Path<z.infer<T>>>;
+        form: UseFormReturn<z.infer<T>>;
+        index?: number;
+    }) => React.ReactNode;
+    visibleIn?: "edit" | "preview" | "both";
+    isArray?: boolean;
+    arrayConfig?: {
+        fields: ArrayItemField[];
+        defaultItem: Record<string, unknown>;
+        minItems?: number;
+        maxItems?: number;
+        addButtonText?: string;
+        removeButtonText?: string;
+        renderWrapper?: (props: {
+            children: React.ReactNode;
+            index: number;
+            remove: () => void;
+            canRemove: boolean;
+        }) => React.ReactNode;
+        previewWrapper?: (props: {
+            children: React.ReactNode;
+            index: number;
+        }) => React.ReactNode;
+    };
+}
+
+export interface ArrayItemField {
+    label: string;
+    name: string;
+    description?: string;
+    layout?: {
+        row: number;
+        width?: "full" | "1/2" | "1/3" | "2/3" | "1/4" | "3/4";
+    };
+    render: (props: {
+        field: ControllerRenderProps<FieldValues, string>;
+        form: UseFormReturn<FieldValues>;
+        index?: number;
+    }) => React.ReactNode;
+    preview?: (props: {
+        field: ControllerRenderProps<FieldValues, string>;
+        form: UseFormReturn<FieldValues>;
+        index?: number;
+    }) => React.ReactNode;
+    visibleIn?: "edit" | "preview" | "both";
+}
+
+// Step indicator configuration types
+export interface StepMetadata {
+    title: string;
+    description?: string;
+    icon?: IconName;
+}
+
+export type StepIndicatorVariant =
+    | "default"
+    | "progress"
+    | "breadcrumb"
+    | "milestone"
+    | "dots"
+    | "custom";
+
+export interface StepIndicatorConfig {
+    variant: StepIndicatorVariant;
+    steps?: StepMetadata[];
+    showPercentage?: boolean;
+    showStepNumber?: boolean;
+    customRender?: (props: {
+        currentStep: number;
+        totalSteps: number;
+        steps?: StepMetadata[];
+        percentage: number;
+    }) => React.ReactNode;
+}
+
+export type FormMode = "edit" | "preview";
+
+interface MyFormProps<T extends z.ZodTypeAny> {
+    formSchema: T;
+    defaultValues: z.infer<T>;
+    formItemData: FormFieldItem<T>[] | FormFieldItem<T>[][];
+    onSubmit: (values: z.infer<T>) => void | Promise<void>;
+    buttonActions?: React.ReactNode;
+    submitButtonText?: string;
+    maxHeight?: string;
+    stepIndicator?: StepIndicatorConfig;
+    mode?: FormMode;
+}
+
+/**
+ * Utility to check if a field is required in the zod schema.
+ */
+function isFieldRequired<T extends z.ZodTypeAny>(schema: T, fieldName: string): boolean {
+    if (schema instanceof z.ZodObject) {
+        const shape = schema.shape;
+        if (!shape || !(fieldName in shape)) return false;
+
+        const field = shape[fieldName];
+        if (!field) return false;
+
+        return !(
+            field.isOptional() ??
+            field.isNullable() ??
+            field._def.typeName === "ZodDefault"
+        );
+    }
+
+    return false;
+}
+
+const MyForm = <T extends z.ZodTypeAny>({
+    formSchema,
+    defaultValues,
+    formItemData,
+    onSubmit,
+    submitButtonText = "Submit",
+    buttonActions = <Button type="submit" className="w-full">{submitButtonText}</Button>,
+    maxHeight = "400px",
+    stepIndicator,
+    mode = "edit"
+}: MyFormProps<T>) => {
+    const [currentStep, setCurrentStep] = React.useState(0);
+    const form = useForm({
+        resolver: zodResolver(formSchema),
+        defaultValues
+    });
+
+    const isMultiStep = Array.isArray(formItemData[0]);
+    const currentStepItems = isMultiStep
+        ? (formItemData as FormFieldItem<T>[][])[currentStep]
+        : (formItemData as FormFieldItem<T>[]);
+    const totalSteps = isMultiStep ? formItemData.length : 1;
+    const isLastStep = currentStep === totalSteps - 1;
+    const percentage = Math.round(((currentStep + 1) / totalSteps) * 100);
+
+    const handleNext = async (e: React.MouseEvent) => {
+        e.stopPropagation();
+        const fields = currentStepItems.map(item => item.name);
+        const isValid = await form.trigger(fields);
+        if (isValid) {
+            setCurrentStep(prev => Math.min(prev + 1, totalSteps - 1));
+        }
+    };
+
+    const handlePrevious = (e: React.MouseEvent) => {
+        e.stopPropagation();
+        setCurrentStep(prev => Math.max(prev - 1, 0));
+    };
+
+    const renderStepIndicator = () => {
+        if (!isMultiStep) return null;
+
+        const config = stepIndicator || { variant: "default" };
+        const props = {
+            currentStep,
+            totalSteps,
+            percentage,
+            steps: config.steps
+        };
+
+        switch (config.variant) {
+            case "progress":
+                return <ProgressStepIndicator {...props} />;
+            case "breadcrumb":
+                return <BreadcrumbStepIndicator {...props} />;
+            case "milestone":
+                return <MilestoneStepIndicator {...props} />;
+            case "dots":
+                return <DotsStepIndicator {...props} />;
+            case "custom":
+                return config.customRender?.(props) || null;
+            case "default":
+            default:
+                return (
+                    <DefaultStepIndicator
+                        {...props}
+                        showPercentage={config.showPercentage}
+                        showStepNumber={config.showStepNumber}
+                    />
+                );
+        }
+    };
+
+    const renderFieldItem = (item: FormFieldItem<T>, prefix?: string) => {
+        const fieldName = prefix ? `${prefix}.${item.name}` : item.name;
+        const required = isFieldRequired(formSchema, item.name as string);
+
+        // Default preview renderer if no custom preview is provided
+        const defaultPreview = (field: ControllerRenderProps<z.infer<T>, Path<z.infer<T>>>) => (
+            <p className="text-sm p-2 bg-muted rounded-md min-h-[40px] flex items-center">
+                {field.value || "-"}
+            </p>
+        );
+
+        return (
+            <div
+                key={fieldName}
+                className={cn(
+                    "col-span-1",
+                    getGridCols(item.layout?.width)
+                )}
+            >
+                <FormField
+                    control={form.control}
+                    name={fieldName as Path<z.infer<T>>}
+                    render={({ field }) => (
+                        <FormItem>
+                            <FormLabel>
+                                {item.label}
+                                {mode === "edit" && required && <span style={{ color: "red", marginLeft: '-4px' }}>*</span>}
+                            </FormLabel>
+                            <FormControl>
+                                {mode === "preview" 
+                                    ? (item.preview 
+                                        ? item.preview({ field, form }) 
+                                        : defaultPreview(field)
+                                    )
+                                    : item.render({ field, form })
+                                }
+                            </FormControl>
+                            {item.description && (
+                                <FormDescription>
+                                    {item.description}
+                                </FormDescription>
+                            )}
+                            {mode === "edit" && <FormMessage />}
+                        </FormItem>
+                    )}
+                />
+            </div>
+        );
+    };
+
+    const renderArrayField = (item: FormFieldItem<T>) => {
+        if (!item.arrayConfig) return null;
+
+        return (
+            <ArrayField
+                key={item.name}
+                item={item}
+                form={form}
+                mode={mode}
+            />
+        );
+    };
+
+    // Filter fields based on visibility and current mode
+    const isFieldVisible = (item: FormFieldItem<T>) => {
+        const visibleIn = item.visibleIn || "both";
+        return visibleIn === "both" || visibleIn === mode;
+    };
+
+    const visibleItems = currentStepItems.filter(isFieldVisible);
+    const regularFields = visibleItems.filter(item => !item.isArray);
+    const arrayFields = visibleItems.filter(item => item.isArray);
+
+    const groupedItems = regularFields.reduce<Record<number, FormFieldItem<T>[]>>((acc, item) => {
+        const row = item.layout?.row ?? 0;
+        if (!acc[row]) {
+            acc[row] = [];
+        }
+        acc[row].push(item);
+        return acc;
+    }, {});
+
+    const rows = Object.entries(groupedItems)
+        .map(([row, items]) => ({ row: parseInt(row), items }))
+        .sort((a, b) => a.row - b.row);
+
+    const handleFormSubmit = (e: React.FormEvent) => {
+        e.preventDefault();
+        e.stopPropagation();
+        form.handleSubmit(onSubmit)(e);
+    };
+
+    return (
+        <Form {...form}>
+            <form onSubmit={handleFormSubmit}>
+                {renderStepIndicator()}
+
+                <div
+                    className={cn(
+                        "space-y-6",
+                        maxHeight && "overflow-y-auto p-3"
+                    )}
+                    style={maxHeight ? { maxHeight } : undefined}
+                >
+                    {rows.map(({ row, items }) => (
+                        <div key={`row-${row}`} className="grid grid-cols-1 sm:grid-cols-12 gap-6">
+                            {items.map((item) => renderFieldItem(item))}
+                        </div>
+                    ))}
+
+                    {arrayFields.map(renderArrayField)}
+                </div>
+
+                <div className="pt-6 flex justify-between gap-4">
+                    {isMultiStep && currentStep > 0 && (
+                        <Button
+                            type="button"
+                            variant="outline"
+                            onClick={handlePrevious}
+                        // className="flex-1"
+                        >
+                            Previous
+                        </Button>
+                    )}
+                    {isMultiStep && !isLastStep ? (
+                        <Button
+                            type="button"
+                            onClick={handleNext}
+                            className="ml-auto"
+                        >
+                            Next
+                        </Button>
+                    ) : (
+                        <div className={cn("flex-1", { "ml-auto": isMultiStep && currentStep > 0 })}>
+                            {buttonActions}
+                        </div>
+                    )}
+                </div>
+            </form>
+        </Form>
+    )
+}
+
+export default MyForm
