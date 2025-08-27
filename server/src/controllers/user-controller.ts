@@ -2,6 +2,8 @@ import type { Request, Response } from 'express';
 import UserService from '../services/user-service.js';
 import type { User, CreateItem } from '@config-vault/shared';
 import { successResponse } from '../lib/response.js';
+import ApiError from '../utils/error.js';
+import status from 'http-status';
 
 class UserController {
     private readonly userService: UserService;
@@ -11,112 +13,84 @@ class UserController {
     }
 
     public createUser = async (req: Request, res: Response): Promise<void> => {
-            const userData: CreateItem<User> = req.body;
-            
-            if (!userData.username || !userData.email || !userData.password) {
-                res.status(400).json({
-                    success: false,
-                    message: 'Username, email, and password are required'
-                });
-                return;
-            }
+        const userData: CreateItem<User> = req.body;
 
-            const newUser = await this.userService.createUser(userData);
-            
-            const { password, ...userResponse } = newUser;
+        if (!userData.username || !userData.email || !userData.password) {
+            res.status(400).json({
+                success: false,
+                message: 'Username, email, and password are required'
+            });
+            return;
+        }
 
-            successResponse.data = userResponse;
-            res.status(201).json(successResponse);
+        const newUser = await this.userService.createUser(userData);
+
+        const { password, ...userResponse } = newUser;
+
+        successResponse.data = userResponse;
+        res.status(201).json(successResponse);
     };
 
     public getUserById = async (req: Request, res: Response): Promise<void> => {
-            const { id } = req.params;
+        const { id } = req.params;
 
-            if (!id) {
-                res.status(400).json({
-                    success: false,
-                    message: 'User ID is required'
-                });
-                return;
-            }
+        if (!id) {
+            throw new ApiError("User ID is required", status.BAD_REQUEST);
+        }
 
-            const user = await this.userService.getUserById(id);
+        const user = await this.userService.getUserById(id);
 
-            const { password, ...userResponse } = user;
-            successResponse.data = userResponse;
-            res.status(200).json(successResponse);
+        const { password, ...userResponse } = user;
+        successResponse.data = userResponse;
+        res.status(200).json(successResponse);
     };
 
-     public getProfile = async (req: Request, res: Response): Promise<void> => {
-            const user = req.user;
+    public getProfile = async (req: Request, res: Response): Promise<void> => {
+        const user = req.user;
 
-            if (!user?.id) {
-                res.status(400).json({
-                    success: false,
-                    message: 'User ID is required'
-                });
-                return;
-            }
+        if (!user?.id) {
+            throw new ApiError("User not authenticated", status.UNAUTHORIZED);
+        }
 
-            const response = await this.userService.getUserById(user.id);
+        const response = await this.userService.getUserById(user.id);
 
-            const { password, ...userResponse } = response;
-            successResponse.data = userResponse;
-            res.status(200).json(successResponse);
+        const { password, ...userResponse } = response;
+        successResponse.data = userResponse;
+        res.status(200).json(successResponse);
     };
-    
+
 
     public updateUser = async (req: Request, res: Response): Promise<void> => {
-            const { id } = req.params;
-            const updateData: Partial<CreateItem<User>> = req.body;
+        const { id } = req.params;
+        const updateData: Partial<CreateItem<User>> = req.body;
 
-            if (!id) {
-                res.status(400).json({
-                    success: false,
-                    message: 'User ID is required'
-                });
-                return;
-            }
+        if (!id) {
+            throw new ApiError("User ID is required", status.BAD_REQUEST);
+        }
 
-            const updatedUser = await this.userService.updateUser(id, updateData);
+        const updatedUser = await this.userService.updateUser(id, updateData);
 
-            if (!updatedUser) {
-                res.status(404).json({
-                    success: false,
-                    message: 'User not found'
-                });
-                return;
-            }
+        if (!updatedUser) {
+            throw new ApiError("User not found", status.NOT_FOUND);
+        }
 
-            const { password, ...userResponse } = updatedUser;
+        const { password, ...userResponse } = updatedUser;
 
-            successResponse.data = userResponse;
-            res.status(200).json(successResponse);
+        successResponse.data = userResponse;
+        res.status(200).json(successResponse);
     };
 
     public deleteUser = async (req: Request, res: Response): Promise<void> => {
-            const { id } = req.params;
+        const { id } = req.params;
 
-            if (!id) {
-                res.status(400).json({
-                    success: false,
-                    message: 'User ID is required'
-                });
-                return;
-            }
+        if (!id) {
+            throw new ApiError("User ID is required", status.BAD_REQUEST);
+        }
 
-            const result = await this.userService.deleteUser(id);
+        await this.userService.deleteUser(id);
 
-            if (!result) {
-                res.status(404).json({
-                    success: false,
-                    message: 'User not found'
-                });
-                return;
-            }
-
-            successResponse.message = 'User deleted successfully';
-            res.status(200).json(successResponse);
+        successResponse.message = 'User deleted successfully';
+        res.status(200).json(successResponse);
     };
 }
 
