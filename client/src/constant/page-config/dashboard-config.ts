@@ -1,14 +1,18 @@
-import type { BreadcrumbData } from "@/components/core/MyBreadcrumb"
 import type { PageConfig } from "@/types"
+import { rootConfig } from "./root-config"
+import type { IconName } from "@/components/ui/icon";
 
-const sidebarBaseBreadcrumb: BreadcrumbData = { id: 1, label: "Dashboard", url: "/", icon: "LayoutDashboard" }
+const dashboardName: string = "Dashboard";
+const dashboardIcon: IconName = "LayoutDashboard";
+const path: string = "/";
 
 export const dashboardConfig: PageConfig = {
-    name: "Dashboard",
-    icon: "LayoutDashboard",
-    path: "/",
+    name: dashboardName,
+    icon: dashboardIcon,
+    path: path,
     isActive: true,
     breadcrumb: [
-        sidebarBaseBreadcrumb,
+        rootConfig.baseBreadcrumb,
+        { id: 2, label: dashboardName, url: path, icon: dashboardIcon }
     ]
 }

@@ -1,10 +1,10 @@
 import SectionWrapper from "@/components/core/wrapper/SectionWrapper"
 import { pageConfig } from "@/constant/page-config"
 
-const Dashboard = () => {
+const Profile = () => {
   return (
-    <div>Dashboard</div>
+    <div>Profile</div>
   )
 }
 
-export default SectionWrapper("dashboard", Dashboard, pageConfig.dashboard.breadcrumb)
+export default SectionWrapper("profile", Profile, pageConfig.profile.breadcrumb)

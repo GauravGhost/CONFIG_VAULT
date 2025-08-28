@@ -10,12 +10,12 @@ import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar"
 import Text from "../ui/text";
 import { ShowAlert } from "../ui/my-alert/my-alert";
 import { storage } from "@/lib/storage";
-import { useNavigate } from "react-router";
+import { Link, useNavigate } from "react-router";
 import { toast } from "sonner";
 
 const ProfileMenu = () => {
     const navigate = useNavigate();
-     const handleLogout = async () => {
+    const handleLogout = async () => {
         const confirmed = await ShowAlert({
             title: "Logout",
             description: "Are you sure you want to logout?",
@@ -42,8 +42,8 @@ const ProfileMenu = () => {
             <DropdownMenuContent>
                 <DropdownMenuLabel>My Account</DropdownMenuLabel>
                 <DropdownMenuSeparator />
-                <DropdownMenuItem asChild><Text className="w-full cursor-pointer">Profile</Text></DropdownMenuItem>
-                <DropdownMenuItem asChild><Text className="w-full cursor-pointer">Settings</Text></DropdownMenuItem>
+                <DropdownMenuItem asChild><Text className="w-full cursor-pointer"><Link to="/profile">Profile</Link></Text></DropdownMenuItem>
+                <DropdownMenuItem asChild><Text className="w-full cursor-pointer"><Link to="/settings">Settings</Link></Text></DropdownMenuItem>
                 <DropdownMenuSeparator />
                 <DropdownMenuItem onClick={handleLogout}>
                     <Text className="w-full text-destructive cursor-pointer">Logout</Text>
