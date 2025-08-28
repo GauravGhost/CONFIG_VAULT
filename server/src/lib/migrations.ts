@@ -154,5 +154,11 @@ CREATE INDEX IF NOT EXISTS idx_config_access_logs_accessed_by ON configuration_a
         description: 'Add avatar_url field to users table',
         up: 'ALTER TABLE users ADD COLUMN avatar_url TEXT;',
         down: 'ALTER TABLE users DROP COLUMN avatar_url;'
+    },
+    {
+        version: 3,
+        description: 'Add name field to users table',
+        up: 'ALTER TABLE users ADD COLUMN name TEXT;',
+        down: 'ALTER TABLE users DROP COLUMN name;'
     }
 ];
