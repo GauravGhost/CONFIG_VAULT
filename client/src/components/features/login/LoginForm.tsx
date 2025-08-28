@@ -20,6 +20,7 @@ import { Button } from "@/components/ui/button"
 import { useState } from "react"
 import type { Login, LoginResponse } from "@config-vault/shared"
 import { Icon } from "@/components/ui/icon"
+import useProfileStore from "@/store/useProfileStore"
 const loginSchema = z.object({
     username: z.string().min(2, {
         message: "Username must be at least 2 characters.",
@@ -36,6 +37,7 @@ export function LoginForm({
     const navigate = useNavigate();
     const login = usePostApi<LoginResponse>();
     const { startLoading, stopLoading } = useLoaderStore();
+    const { setUser } = useProfileStore();
 
     const handleSubmit = async (values: Login) => {
         await login.postData(
@@ -44,9 +46,10 @@ export function LoginForm({
             {
                 actionCallbacks: {
                     onSuccess: (data) => {
+                        setUser(data.user);
                         storage.set("AUTH_TOKEN", data.token);
-                        toast.success("Login Successful")
-                        navigate("/")
+                        toast.success("Login Successful");
+                        navigate("/");
                     },
                     onLoadingStart: () => startLoading(),
                     onLoadingStop: () => stopLoading(),

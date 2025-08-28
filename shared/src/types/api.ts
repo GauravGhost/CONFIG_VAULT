@@ -1,9 +1,8 @@
+import { User } from "../schema"
+
 export type LoginResponse = {
-    id: string
-    username: string
-    email?: string
-    role?: string
-    token: string
+    user: User;
+    token: string;
 }
 
 export type Login = {

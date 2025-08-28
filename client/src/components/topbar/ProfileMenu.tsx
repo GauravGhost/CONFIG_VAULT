@@ -13,9 +13,12 @@ import { storage } from "@/lib/storage";
 import { Link, useNavigate } from "react-router";
 import { toast } from "sonner";
 import { pageConfig } from "@/constant/page-config";
+import useProfileStore from "@/store/useProfileStore";
+import { getInitialWords } from "@/lib/utils";
 
 const ProfileMenu = () => {
     const navigate = useNavigate();
+    const { user } = useProfileStore();
     const handleLogout = async () => {
         const confirmed = await ShowAlert({
             title: "Logout",
@@ -36,8 +39,8 @@ const ProfileMenu = () => {
         <DropdownMenu>
             <DropdownMenuTrigger>
                 <Avatar className="cursor-pointer">
-                    <AvatarImage src="" alt="avatar" />
-                    <AvatarFallback>WN</AvatarFallback>
+                    <AvatarImage src={user?.avatar_url} alt="avatar" />
+                    <AvatarFallback>{getInitialWords(user?.name ?? user?.username ?? "UN")}</AvatarFallback>
                 </Avatar>
             </DropdownMenuTrigger>
             <DropdownMenuContent>

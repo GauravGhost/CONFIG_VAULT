@@ -20,13 +20,13 @@ class AuthService {
             throw new ApiError('username or password is invalid', status.BAD_REQUEST);
         }
         const generateToken = await generateAccessToken(user);
-        return { ...user, token: generateToken };
+        return { user, token: generateToken };
     }
 
     public async register({ username, password }: { username: string; password: string }): Promise<any> {
         const user = await this.userService.createUser({ username, password, email: "example@example.com" });
         const token = await generateAccessToken(user);
-        return { ...user, token };
+        return { user, token };
     }
 
 }

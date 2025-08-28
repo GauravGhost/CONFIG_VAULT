@@ -1,13 +1,17 @@
 import { Navigate, useLocation } from "react-router";
 import type { ReactNode } from 'react';
+import { useEffect } from 'react';
 import { storage } from "../../../lib/storage";
+import { usePrivateGetApi } from "@/hooks/useApi";
+import type { User } from "@config-vault/shared";
+import { endpoints } from "@/lib/endpoints";
+import useProfileStore from "@/store/useProfileStore";
+import { Loader } from "@/components/ui/loader";
 
-function isTokenExpired(token: string): boolean {
+const isTokenExpired = (token: string): boolean => {
     try {
         const payload = JSON.parse(atob(token.split('.')[1]));
-        if (!payload.exp) return false;
-        const now = Math.floor(Date.now() / 1000);
-        return payload.exp < now;
+        return payload.exp ? Math.floor(Date.now() / 1000) >= payload.exp : false;
     } catch {
         return true;
     }
@@ -15,23 +19,32 @@ function isTokenExpired(token: string): boolean {
 
 export function PrivateRoute({ children }: Readonly<{ children: ReactNode }>) {
     const location = useLocation();
+    const { fetch, data, loading, error } = usePrivateGetApi<User>();
+    const { setUser, user } = useProfileStore();
 
-    const token = storage.get<string>('AUTH_TOKEN');
+    useEffect(() => {
+        if (user) return;
 
-    const isAuthenticated = () => {
-        if (!token) {
-            return false;
-        }
-        if (isTokenExpired(token)) {
+        const token = storage.get<string>('AUTH_TOKEN');
+        
+        if (!token || isTokenExpired(token)) {
             storage.remove('AUTH_TOKEN');
-            return false;
+            return;
         }
-        return true;
-    };
 
-    if (!isAuthenticated()) {
-        return <Navigate to="/login" state={{ from: location }} replace />;
-    }
+        fetch(endpoints.users.getCurrent);
+    }, [user, fetch]);
 
-    return children;
+    useEffect(() => {
+        if (data) setUser(data);
+    }, [data, setUser]);
+
+    const isAuthenticated = user || data;
+    const shouldRedirect = !loading && !isAuthenticated && (error || !storage.get<string>('AUTH_TOKEN'));
+
+    if (loading) return <Loader fullScreen />;
+    if (shouldRedirect) return <Navigate to="/login" state={{ from: location }} replace />;
+    if (isAuthenticated) return children;
+
+    return <Loader fullScreen />;
 }
