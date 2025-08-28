@@ -10,9 +10,12 @@ import type { User } from "@config-vault/shared";
 import { getInitialWords } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { colorTheme } from "@/constant/enums";
+import ManageProfile from "./ManageProfile";
+import { useState } from "react";
 
-const ProfilePreview = () => {
+const PreviewProfile = () => {
     const { data: userData, loading } = usePrivateGetApi<User>(endpoints.users.getCurrent);
+    const [isPreviewOpen, setIsPreviewOpen] = useState(false);
 
     if (loading && !userData) {
         return <Loader isLoading={loading} />
@@ -117,6 +120,10 @@ const ProfilePreview = () => {
                                         {userData?.updated_at ? formatDate(userData.updated_at, 'relative') : 'N/A'}
                                     </p>
                                 </div>
+                            <ManageProfile
+                                open={isPreviewOpen}
+                                onOpenChange={setIsPreviewOpen}
+                            />
                             </div>
                         </div>
                     </div>
@@ -126,4 +133,4 @@ const ProfilePreview = () => {
     )
 }
 
-export default ProfilePreview
+export default PreviewProfile

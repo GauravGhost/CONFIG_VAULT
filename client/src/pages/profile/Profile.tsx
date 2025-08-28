@@ -1,10 +1,10 @@
 import SectionWrapper from "@/components/core/wrapper/SectionWrapper"
-import ProfilePreview from "@/components/features/profile/ProfilePreview"
+import PreviewProfile from "@/components/features/profile/PreviewProfile"
 import { pageConfig } from "@/constant/page-config"
 
 const Profile = () => {
   return (
-    <ProfilePreview />
+    <PreviewProfile />
   )
 }
 
