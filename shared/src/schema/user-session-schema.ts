@@ -1,6 +1,6 @@
 import { z } from "zod";
-import { createCrudSchemaTypes, createSchemaTypes } from "../utils/schema-types.js";
-import { baseModelSchema } from "./base-schema.js";
+import { createCrudSchemaTypes, createSchemaTypes } from "../utils/schema-types";
+import { baseModelSchema } from "./base-schema";
 
 export const userSessionSchema = baseModelSchema.extend({
     user_id: z.string().min(1, "User ID is required"),

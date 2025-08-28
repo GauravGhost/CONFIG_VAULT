@@ -1,6 +1,6 @@
 import { z } from "zod";
-import { createCrudSchemaTypes, createSchemaTypes } from "../utils/schema-types.js";
-import { baseModelSchema, fileTypeEnum } from "./base-schema.js";
+import { createCrudSchemaTypes, createSchemaTypes } from "../utils/schema-types";
+import { baseModelSchema, fileTypeEnum } from "./base-schema";
 
 export const templateSchema = baseModelSchema.extend({
     name: z.string().min(1, "Template name is required"),

@@ -1,6 +1,6 @@
 import { z } from "zod";
-import { createCrudSchemaTypes, createSchemaTypes } from "../utils/schema-types.js";
-import { baseModelSchema, environmentEnum, serviceStatusEnum } from "./base-schema.js";
+import { createCrudSchemaTypes, createSchemaTypes } from "../utils/schema-types";
+import { baseModelSchema, environmentEnum, serviceStatusEnum } from "./base-schema";
 
 export const serviceSchema = baseModelSchema.extend({
     project_id: z.string().min(1, "Project ID is required"),

@@ -1,6 +1,6 @@
 import { z } from "zod";
-import { createCrudSchemaTypes, createSchemaTypes } from "../utils/schema-types.js";
-import { baseModelSchema, permissionLevelEnum } from "./base-schema.js";
+import { createCrudSchemaTypes, createSchemaTypes } from "../utils/schema-types";
+import { baseModelSchema, permissionLevelEnum } from "./base-schema";
 
 export const configurationShareSchema = baseModelSchema.extend({
     config_id: z.string().min(1, "Configuration ID is required"),

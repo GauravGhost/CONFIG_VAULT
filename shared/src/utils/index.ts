@@ -1,3 +1,3 @@
-export * from "./endpoints.js";
-export * from "./constant.js";
-export * from "./schema-types.js";
+export * from "./endpoints";
+export * from "./constant";
+export * from "./schema-types";

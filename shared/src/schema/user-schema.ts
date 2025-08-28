@@ -1,6 +1,6 @@
 import { z } from "zod";
-import { createCrudSchemaTypes, createSchemaTypes } from "../utils/schema-types.js";
-import { baseModelSchema, userRoleEnum } from "./base-schema.js";
+import { createCrudSchemaTypes, createSchemaTypes } from "../utils/schema-types";
+import { baseModelSchema, userRoleEnum } from "./base-schema";
 
 export const userSchema = baseModelSchema.extend({
     username: z.string().min(1, "Username is required"),

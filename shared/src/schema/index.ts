@@ -1,24 +1,24 @@
-import { createUserSchema, updateUserSchema } from "./user-schema.js";
-import { createProjectSchema, updateProjectSchema } from "./project-schema.js";
-import { createConfigurationSchema, updateConfigurationSchema } from "./configuration-schema.js";
-import { createConfigurationHistorySchema, updateConfigurationHistorySchema } from "./configuration-history-schema.js";
-import { createServiceSchema, updateServiceSchema } from "./service-schema.js";
-import { createTemplateSchema, updateTemplateSchema } from "./template-schema.js";
-import { createUserSessionSchema, updateUserSessionSchema } from "./user-session-schema.js";
-import { createConfigurationShareSchema, updateConfigurationShareSchema } from "./configuration-share-schema.js";
-import { createConfigurationAccessLogSchema, updateConfigurationAccessLogSchema } from "./configuration-access-log-schema.js";
+import { createUserSchema, updateUserSchema } from "./user-schema";
+import { createProjectSchema, updateProjectSchema } from "./project-schema";
+import { createConfigurationSchema, updateConfigurationSchema } from "./configuration-schema";
+import { createConfigurationHistorySchema, updateConfigurationHistorySchema } from "./configuration-history-schema";
+import { createServiceSchema, updateServiceSchema } from "./service-schema";
+import { createTemplateSchema, updateTemplateSchema } from "./template-schema";
+import { createUserSessionSchema, updateUserSessionSchema } from "./user-session-schema";
+import { createConfigurationShareSchema, updateConfigurationShareSchema } from "./configuration-share-schema";
+import { createConfigurationAccessLogSchema, updateConfigurationAccessLogSchema } from "./configuration-access-log-schema";
 
 // Re-export all schemas and types
-export * from "./base-schema.js";
-export * from "./user-schema.js";
-export * from "./project-schema.js";
-export * from "./configuration-schema.js";
-export * from "./configuration-history-schema.js";
-export * from "./service-schema.js";
-export * from "./template-schema.js";
-export * from "./user-session-schema.js";
-export * from "./configuration-share-schema.js";
-export * from "./configuration-access-log-schema.js";
+export * from "./base-schema";
+export * from "./user-schema";
+export * from "./project-schema";
+export * from "./configuration-schema";
+export * from "./configuration-history-schema";
+export * from "./service-schema";
+export * from "./template-schema";
+export * from "./user-session-schema";
+export * from "./configuration-share-schema";
+export * from "./configuration-access-log-schema";
 
 export const schema = {
     // Create and Update operation schemas
