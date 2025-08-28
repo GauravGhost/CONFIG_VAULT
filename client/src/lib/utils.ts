@@ -6,9 +6,18 @@ export function cn(...inputs: ClassValue[]) {
 }
 
 export const formatToSentenceCase = (text: string) => {
-    if (!text) return '';
-    return text
-        .toLowerCase()
-        .replace(/_/g, ' ')
-        .replace(/\b\w/g, (char) => char.toUpperCase());
+  if (!text) return '';
+  return text
+    .toLowerCase()
+    .replace(/_/g, ' ')
+    .replace(/\b\w/g, (char) => char.toUpperCase());
+};
+
+export const getInitialWords = (name: string) => {
+  return name
+    .split(' ')
+    .map(n => n[0])
+    .join('')
+    .toUpperCase()
+    .slice(0, 2);
 };

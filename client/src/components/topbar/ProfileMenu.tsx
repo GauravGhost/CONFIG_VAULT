@@ -12,6 +12,7 @@ import { ShowAlert } from "../ui/my-alert/my-alert";
 import { storage } from "@/lib/storage";
 import { Link, useNavigate } from "react-router";
 import { toast } from "sonner";
+import { pageConfig } from "@/constant/page-config";
 
 const ProfileMenu = () => {
     const navigate = useNavigate();
@@ -42,8 +43,16 @@ const ProfileMenu = () => {
             <DropdownMenuContent>
                 <DropdownMenuLabel>My Account</DropdownMenuLabel>
                 <DropdownMenuSeparator />
-                <DropdownMenuItem asChild><Text className="w-full cursor-pointer"><Link to="/profile">Profile</Link></Text></DropdownMenuItem>
-                <DropdownMenuItem asChild><Text className="w-full cursor-pointer"><Link to="/settings">Settings</Link></Text></DropdownMenuItem>
+                <DropdownMenuItem asChild>
+                    <Link to={pageConfig.profile.path} className="w-full cursor-pointer">
+                        Profile
+                    </Link>
+                </DropdownMenuItem>
+                <DropdownMenuItem asChild>
+                    <Link to="/settings" className="w-full cursor-pointer">
+                        Settings
+                    </Link>
+                </DropdownMenuItem>
                 <DropdownMenuSeparator />
                 <DropdownMenuItem onClick={handleLogout}>
                     <Text className="w-full text-destructive cursor-pointer">Logout</Text>
