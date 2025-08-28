@@ -1,10 +1,4 @@
 import {
-  ChevronDown,
-  ChevronRight,
-} from "lucide-react";
-
-
-import {
   Sidebar,
   SidebarContent,
   SidebarFooter,
@@ -18,12 +12,11 @@ import {
   SidebarMenuSubItem,
   useSidebar,
 } from "@/components/ui/sidebar";
-import { useCallback, useMemo, useState, memo } from "react";
+import { useCallback, useMemo, useState, memo, useEffect } from "react";
 import { useNavigate, useLocation } from "react-router";
 import { storage } from "@/lib/storage";
 import { ShowAlert } from "../ui/my-alert/my-alert";
 import { toast } from "sonner";
-import { Image } from "../ui/image";
 import Text from "../ui/text";
 import { sidebarItems } from "@/routes/sidebarMapping";
 import { Icon, type IconName } from "../ui/icon";
@@ -32,6 +25,7 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
+import useTypewriter from "@/hooks/useTypewriter";
 
 interface MenuItem {
   title: string;
@@ -155,9 +149,9 @@ const ExpandedMenuItemWithChildren = memo(
             <Text>{item.title}</Text>
           </div>
           {isExpanded(item.title) ? (
-            <ChevronDown className="h-4 w-4 min-h-4 min-w-4 flex-shrink-0" />
+            <Icon name="ChevronDown" className="h-4 w-4 min-h-4 min-w-4 flex-shrink-0" />
           ) : (
-            <ChevronRight className="h-4 w-4 min-h-4 min-w-4 flex-shrink-0" />
+            <Icon name="ChevronRight" className="h-4 w-4 min-h-4 min-w-4 flex-shrink-0" />
           )}
         </div>
       </SidebarMenuButton>
@@ -210,7 +204,26 @@ function AppSidebar() {
   const [expandedItems, setExpandedItems] = useState<string[]>([]);
   const [openPopovers, setOpenPopovers] = useState<Record<string, boolean>>({});
 
-  // Memoized callbacks to prevent recreation on each render
+  const typewriterConfig = useMemo(() => ({
+    text: "CONFIG VAULT",
+    speed: 60,
+    startDelay: 50
+  }), []);
+
+  const { displayText: titleText, setIsVisible: setTitleVisible } = useTypewriter(
+    typewriterConfig.text,
+    typewriterConfig.speed,
+    typewriterConfig.startDelay
+  );
+
+  const updateTitleVisibility = useCallback(() => {
+    setTitleVisible(state !== "collapsed");
+  }, [state, setTitleVisible]);
+
+  useEffect(() => {
+    updateTitleVisibility();
+  }, [updateTitleVisibility]);
+
   const toggleExpand = useCallback((title: string) => {
     setExpandedItems((prev) =>
       prev.includes(title)
@@ -257,7 +270,7 @@ function AppSidebar() {
   }, [navigate]);
   const logoComponent = useMemo(
     () => (
-      <Icon name="PersonStanding" />
+      <Icon name="Vault" />
     ),
     [state]
   );
@@ -293,7 +306,6 @@ function AppSidebar() {
   const menuItems = useMemo(
     () =>
       filteredSidebarItems.map((item) => {
-        // Determine which component to render based on item properties and state
         let menuContent;
 
         if (item.children) {
@@ -357,7 +369,17 @@ function AppSidebar() {
 
   return (
     <Sidebar collapsible="icon">
-      {logoComponent}
+      <div className="flex gap-4 p-4">
+        {logoComponent}
+        {state !== "collapsed" && (
+          <Text
+            variant="h4"
+            className="min-w-0 font-mono"
+          >
+            {titleText}
+          </Text>
+        )}
+      </div>
       <SidebarContent>
         <SidebarGroup>
           <SidebarGroupContent>
