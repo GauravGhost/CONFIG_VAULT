@@ -56,6 +56,7 @@ class UserController {
 
         const { password, ...userResponse } = response;
         successResponse.data = userResponse;
+        successResponse.message = 'Profile retrieved successfully';
         res.status(200).json(successResponse);
     };
 
