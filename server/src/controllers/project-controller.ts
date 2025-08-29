@@ -11,6 +11,13 @@ class ProjectController {
         this.projectService = new ProjectService();
     }
 
+    public getAllProjects = async (req: Request, res: Response): Promise<void> => {
+        const projects = await this.projectService.getAllProjects();
+
+        successResponse.data = projects;
+        res.status(200).json(successResponse);
+    }
+
     public getProjectById = async (req: Request, res: Response): Promise<void> => {
         const { id } = req.params;
         if (!id) {

@@ -1,7 +1,8 @@
-import router from '../lib/async-router.js'
+import createRouter from '../lib/async-router.js'
 import UserController from '../controllers/user-controller.js';
 import { checkUserAuth } from '../lib/jwt.js';
 
+const router = createRouter();
 const userController = new UserController();
 
 router.postAsync('/', userController.createUser);

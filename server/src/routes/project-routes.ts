@@ -1,9 +1,11 @@
-import router from '../lib/async-router.js'
+import createRouter from '../lib/async-router.js'
 import { checkUserAuth } from '../lib/jwt.js';
 import ProjectController from '../controllers/project-controller.js';
 
+const router = createRouter();
 const projectController = new ProjectController();
 
+router.getAsync('/', checkUserAuth, projectController.getAllProjects);
 router.postAsync('/', checkUserAuth, projectController.createProject);
 router.getAsync('/:id', checkUserAuth, projectController.getProjectById);
 router.putAsync('/:id', checkUserAuth, projectController.updateProject);

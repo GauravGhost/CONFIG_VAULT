@@ -3,7 +3,7 @@ import express from 'express';
 
 type AsyncRequestHandler = (req: Request, res: Response, next: NextFunction) => Promise<void> | void;
 
-interface AsyncRouter extends Router {
+export interface AsyncRouter extends Router {
     allAsync: (path: string, ...handlers: AsyncRequestHandler[]) => Router;
     getAsync: (path: string, ...handlers: AsyncRequestHandler[]) => Router;
     postAsync: (path: string, ...handlers: AsyncRequestHandler[]) => Router;
@@ -47,4 +47,4 @@ function createRouter(): AsyncRouter {
     return router;
 }
 
-export default createRouter();
+export default createRouter;

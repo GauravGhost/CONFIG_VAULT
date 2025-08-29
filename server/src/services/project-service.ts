@@ -10,6 +10,11 @@ class ProjectService {
         this.projectRepository = new ProjectRepository();
     }
 
+    public async getAllProjects(): Promise<Project[]> {
+        const projects = await this.projectRepository.findAll();
+        return projects;
+    }
+
     public async getProjectById(id: string): Promise<Project | null> {
         const project = await this.projectRepository.findById(id);
         return project;

@@ -1,6 +1,7 @@
-import router from '../lib/async-router.js'
+import createRouter from '../lib/async-router.js'
 import AuthController from '../controllers/auth-controller.js';
 
+const router = createRouter();
 const authController = new AuthController();
 
 router.postAsync('/login', authController.login);
