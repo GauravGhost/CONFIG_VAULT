@@ -1,6 +1,5 @@
 import * as React from "react"
-import { useFieldArray, type ControllerRenderProps, type Path, type FieldArrayPath, type UseFormReturn, type FieldValues } from "react-hook-form"
-import { z } from "zod"
+import { useFieldArray, type FieldArrayPath, type UseFormReturn, type FieldValues } from "react-hook-form"
 import {
     FormControl,
     FormDescription,
@@ -16,12 +15,12 @@ import { cn } from "@/lib/utils"
 import type { FormFieldItem } from "../my-form"
 import { getGridCols } from "./formUtils."
 
-function ArrayField<T extends z.ZodTypeAny>({
+function ArrayField<TFormData extends FieldValues = FieldValues>({
     item,
     form,
     mode = "edit"
 }: Readonly<{
-    item: FormFieldItem<T>;
+    item: FormFieldItem<TFormData>;
     form: UseFormReturn<FieldValues>;
     mode?: "edit" | "preview";
 }>) {
@@ -111,35 +110,21 @@ function ArrayField<T extends z.ZodTypeAny>({
                                 >
                                     <FormField
                                         control={form.control}
-                                        name={fieldName as Path<z.infer<T>>}
+                                        name={fieldName}
                                         render={({ field }) => {
-                                            // Default preview renderer for array fields
-                                            const defaultPreview = (field: ControllerRenderProps<FieldValues, string>) => (
-                                                <p className="text-sm p-2 bg-muted rounded-md min-h-[40px] flex items-center">
-                                                    {field.value || "-"}
-                                                </p>
-                                            );
+                                            let content;
+                                            if (mode === "preview") {
+                                                content = fieldItem.preview 
+                                                    ? fieldItem.preview({ field, form, index })
+                                                    : <p className="text-sm p-2 bg-muted rounded-md min-h-[40px] flex items-center">{field.value || "-"}</p>;
+                                            } else {
+                                                content = fieldItem.render({ field, form, index });
+                                            }
 
                                             return (
                                                 <FormItem>
                                                     <FormLabel>{fieldItem.label}</FormLabel>
-                                                    <FormControl>
-                                                        {mode === "preview" 
-                                                            ? (fieldItem.preview 
-                                                                ? fieldItem.preview({
-                                                                    field: field as ControllerRenderProps<FieldValues, string>,
-                                                                    form,
-                                                                    index
-                                                                }) 
-                                                                : defaultPreview(field as ControllerRenderProps<FieldValues, string>)
-                                                            )
-                                                            : fieldItem.render({
-                                                                field: field as ControllerRenderProps<FieldValues, string>,
-                                                                form,
-                                                                index
-                                                            })
-                                                        }
-                                                    </FormControl>
+                                                    <FormControl>{content}</FormControl>
                                                     {fieldItem.description && (
                                                         <FormDescription>
                                                             {fieldItem.description}

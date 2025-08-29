@@ -2,8 +2,9 @@
   "compilerOptions": {
     "rootDir": "./src",
     "outDir": "./dist",
-    "module": "nodenext",
-    "target": "esnext",
+    "module": "ES2022",
+    "target": "ES2022",
+    "moduleResolution": "bundler",
     "types": [],
     "sourceMap": true,
     "declaration": true,
@@ -19,15 +20,17 @@
     "moduleDetection": "force",
     "skipLibCheck": true,
     "esModuleInterop": true,
-    "allowSyntheticDefaultImports": true
+    "allowSyntheticDefaultImports": true,
+    "allowImportingTsExtensions": false,
+    "resolveJsonModule": true
   },
   "ts-node": {
     "esm": true,
     "experimentalSpecifierResolution": "node",
     "transpileOnly": true,
     "compilerOptions": {
-      "module": "esnext",
-      "target": "esnext",
+      "module": "ES2022",
+      "target": "ES2022",
       "allowJs": true
     }
   }

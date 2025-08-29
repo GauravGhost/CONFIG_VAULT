@@ -1,4 +1,4 @@
-import { createUserSchema, updateUserSchema } from "./user-schema";
+import { changePasswordSchema, createUserSchema, updateUserSchema } from "./user-schema";
 import { createProjectSchema, updateProjectSchema } from "./project-schema";
 import { createConfigurationSchema, updateConfigurationSchema } from "./configuration-schema";
 import { createConfigurationHistorySchema, updateConfigurationHistorySchema } from "./configuration-history-schema";
@@ -35,6 +35,7 @@ export const schema = {
     },
     update: {
         user: updateUserSchema,
+        password: changePasswordSchema,
         project: updateProjectSchema,
         configuration: updateConfigurationSchema,
         configurationHistory: updateConfigurationHistorySchema,

@@ -60,7 +60,7 @@ export function LoginForm({
 
     const [showPassword, setShowPassword] = useState(false);
 
-    const formItemData: FormFieldItem<typeof loginSchema>[] = [
+    const formItemData: FormFieldItem<Login>[] = [
         {
             label: "Username",
             name: "username",

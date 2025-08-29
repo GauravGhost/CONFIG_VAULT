@@ -22,22 +22,22 @@ import DotsStepIndicator from "./my-form/DotStepIndicator"
 import ArrayField from "./my-form/ArrayField"
 import { getGridCols } from "./my-form/formUtils."
 
-export interface FormFieldItem<T extends z.ZodTypeAny> {
+export interface FormFieldItem<TFormData extends FieldValues = FieldValues> {
     label: string;
-    name: Path<z.infer<T>>;
+    name: Path<TFormData>;
     description?: string;
     layout?: {
         row: number;
         width?: "full" | "1/2" | "1/3" | "2/3" | "1/4" | "3/4";
     };
     render: (props: {
-        field: ControllerRenderProps<z.infer<T>, Path<z.infer<T>>>;
-        form: UseFormReturn<z.infer<T>>;
+        field: ControllerRenderProps<TFormData, Path<TFormData>>;
+        form: UseFormReturn<TFormData>;
         index?: number;
     }) => React.ReactNode;
     preview?: (props: {
-        field: ControllerRenderProps<z.infer<T>, Path<z.infer<T>>>;
-        form: UseFormReturn<z.infer<T>>;
+        field: ControllerRenderProps<TFormData, Path<TFormData>>;
+        form: UseFormReturn<TFormData>;
         index?: number;
     }) => React.ReactNode;
     visibleIn?: "edit" | "preview" | "both";
@@ -113,11 +113,11 @@ export interface StepIndicatorConfig {
 
 export type FormMode = "edit" | "preview";
 
-interface MyFormProps<T extends z.ZodTypeAny> {
-    formSchema: T;
-    defaultValues: z.infer<T>;
-    formItemData: FormFieldItem<T>[] | FormFieldItem<T>[][];
-    onSubmit: (values: z.infer<T>) => void | Promise<void>;
+interface MyFormProps<TFormData extends FieldValues = FieldValues> {
+    formSchema: z.ZodType<TFormData, any, any>;
+    defaultValues: TFormData;
+    formItemData: FormFieldItem<TFormData>[] | FormFieldItem<TFormData>[][];
+    onSubmit: (values: TFormData) => void | Promise<void>;
     buttonActions?: React.ReactNode;
     submitButtonText?: string;
     maxHeight?: string;
@@ -128,7 +128,7 @@ interface MyFormProps<T extends z.ZodTypeAny> {
 /**
  * Utility to check if a field is required in the zod schema.
  */
-function isFieldRequired<T extends z.ZodTypeAny>(schema: T, fieldName: string): boolean {
+function isFieldRequired(schema: z.ZodType<any, any, any>, fieldName: string): boolean {
     if (schema instanceof z.ZodObject) {
         const shape = schema.shape;
         if (!shape || !(fieldName in shape)) return false;
@@ -146,7 +146,7 @@ function isFieldRequired<T extends z.ZodTypeAny>(schema: T, fieldName: string): 
     return false;
 }
 
-const MyForm = <T extends z.ZodTypeAny>({
+const MyForm = <TFormData extends FieldValues = FieldValues>({
     formSchema,
     defaultValues,
     formItemData,
@@ -156,17 +156,17 @@ const MyForm = <T extends z.ZodTypeAny>({
     maxHeight = "400px",
     stepIndicator,
     mode = "edit"
-}: MyFormProps<T>) => {
+}: MyFormProps<TFormData>) => {
     const [currentStep, setCurrentStep] = React.useState(0);
-    const form = useForm({
+    const form = useForm<TFormData>({
         resolver: zodResolver(formSchema),
-        defaultValues
+        defaultValues: defaultValues as any
     });
 
     const isMultiStep = Array.isArray(formItemData[0]);
     const currentStepItems = isMultiStep
-        ? (formItemData as FormFieldItem<T>[][])[currentStep]
-        : (formItemData as FormFieldItem<T>[]);
+        ? (formItemData as FormFieldItem<TFormData>[][])[currentStep]
+        : (formItemData as FormFieldItem<TFormData>[]);
     const totalSteps = isMultiStep ? formItemData.length : 1;
     const isLastStep = currentStep === totalSteps - 1;
     const percentage = Math.round(((currentStep + 1) / totalSteps) * 100);
@@ -219,12 +219,12 @@ const MyForm = <T extends z.ZodTypeAny>({
         }
     };
 
-    const renderFieldItem = (item: FormFieldItem<T>, prefix?: string) => {
+    const renderFieldItem = (item: FormFieldItem<TFormData>, prefix?: string) => {
         const fieldName = prefix ? `${prefix}.${item.name}` : item.name;
         const required = isFieldRequired(formSchema, item.name as string);
 
         // Default preview renderer if no custom preview is provided
-        const defaultPreview = (field: ControllerRenderProps<z.infer<T>, Path<z.infer<T>>>) => (
+        const defaultPreview = (field: ControllerRenderProps<TFormData, Path<TFormData>>) => (
             <p className="text-sm p-2 bg-muted rounded-md min-h-[40px] flex items-center">
                 {field.value || "-"}
             </p>
@@ -239,8 +239,8 @@ const MyForm = <T extends z.ZodTypeAny>({
                 )}
             >
                 <FormField
-                    control={form.control}
-                    name={fieldName as Path<z.infer<T>>}
+                    control={form.control as any}
+                    name={fieldName as Path<TFormData>}
                     render={({ field }) => (
                         <FormItem>
                             <FormLabel>
@@ -248,13 +248,14 @@ const MyForm = <T extends z.ZodTypeAny>({
                                 {mode === "edit" && required && <span style={{ color: "red", marginLeft: '-4px' }}>*</span>}
                             </FormLabel>
                             <FormControl>
-                                {mode === "preview" 
-                                    ? (item.preview 
-                                        ? item.preview({ field, form }) 
-                                        : defaultPreview(field)
-                                    )
-                                    : item.render({ field, form })
-                                }
+                                {(() => {
+                                    if (mode === "preview") {
+                                        return item.preview 
+                                            ? item.preview({ field: field as any, form: form as any })
+                                            : defaultPreview(field as any);
+                                    }
+                                    return item.render({ field: field as any, form: form as any });
+                                })()}
                             </FormControl>
                             {item.description && (
                                 <FormDescription>
@@ -269,21 +270,21 @@ const MyForm = <T extends z.ZodTypeAny>({
         );
     };
 
-    const renderArrayField = (item: FormFieldItem<T>) => {
+    const renderArrayField = (item: FormFieldItem<TFormData>) => {
         if (!item.arrayConfig) return null;
 
         return (
             <ArrayField
                 key={item.name}
-                item={item}
-                form={form}
+                item={item as any}
+                form={form as UseFormReturn<FieldValues>}
                 mode={mode}
             />
         );
     };
 
     // Filter fields based on visibility and current mode
-    const isFieldVisible = (item: FormFieldItem<T>) => {
+    const isFieldVisible = (item: FormFieldItem<TFormData>) => {
         const visibleIn = item.visibleIn || "both";
         return visibleIn === "both" || visibleIn === mode;
     };
@@ -292,7 +293,7 @@ const MyForm = <T extends z.ZodTypeAny>({
     const regularFields = visibleItems.filter(item => !item.isArray);
     const arrayFields = visibleItems.filter(item => item.isArray);
 
-    const groupedItems = regularFields.reduce<Record<number, FormFieldItem<T>[]>>((acc, item) => {
+    const groupedItems = regularFields.reduce<Record<number, FormFieldItem<TFormData>[]>>((acc, item) => {
         const row = item.layout?.row ?? 0;
         if (!acc[row]) {
             acc[row] = [];
@@ -308,7 +309,7 @@ const MyForm = <T extends z.ZodTypeAny>({
     const handleFormSubmit = (e: React.FormEvent) => {
         e.preventDefault();
         e.stopPropagation();
-        form.handleSubmit(onSubmit)(e);
+        form.handleSubmit(onSubmit as any)(e);
     };
 
     return (

@@ -1,6 +1,6 @@
 import type { Request, Response } from 'express';
 import UserService from '../services/user-service.js';
-import type { User, CreateItem } from '@config-vault/shared';
+import type { User, CreateItem, ChangePassword } from '@config-vault/shared';
 import { successResponse } from '../lib/response.js';
 import ApiError from '../utils/error.js';
 import status from 'http-status';
@@ -46,13 +46,13 @@ class UserController {
     };
 
     public getProfile = async (req: Request, res: Response): Promise<void> => {
-        const user = req.user;
+        const userId = req.user?.id;
 
-        if (!user?.id) {
+        if (!userId) {
             throw new ApiError("User not authenticated", status.UNAUTHORIZED);
         }
 
-        const response = await this.userService.getUserById(user.id);
+        const response = await this.userService.getUserById(userId);
 
         const { password, ...userResponse } = response;
         successResponse.data = userResponse;
@@ -79,6 +79,21 @@ class UserController {
         successResponse.data = userResponse;
         res.status(200).json(successResponse);
     };
+
+
+    public changePassword = async (req: Request, res: Response): Promise<void> => {
+        const changePasswordData: ChangePassword = req.body;
+        const userId = req.user?.id;
+
+        if (!userId) {
+            throw new ApiError("User not authenticated", status.UNAUTHORIZED);
+        }
+
+        await this.userService.changePassword(userId, changePasswordData);
+
+        successResponse.message = 'Password changed successfully';
+        res.status(200).json(successResponse);
+    }
 
     public deleteUser = async (req: Request, res: Response): Promise<void> => {
         const { id } = req.params;

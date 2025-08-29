@@ -15,6 +15,7 @@ export const permissionLevelEnum = z.enum(['read', 'write', 'admin']);
 export const serviceStatusEnum = z.enum(['unknown', 'running', 'stopped', 'error', 'maintenance']);
 export const accessTypeEnum = z.enum(['view', 'download', 'edit', 'delete', 'share']);
 export const fileTypeEnum = z.enum(['json', 'yaml', 'env', 'properties', 'xml', 'toml', 'ini', 'config']);
+export const activeStatusEnum = z.enum(['true', 'false']);
 
 // Enum types
 export type UserRole = z.infer<typeof userRoleEnum>;

@@ -11,6 +11,7 @@ export const endpoints = {
         getCurrent: `${API_BASE_URL}/users/profile`,
         create: `${API_BASE_URL}/users`,
         update: (id: string) => `${API_BASE_URL}/users/${id}`,
+        changePassword: `${API_BASE_URL}/users/change-password`,
         delete: (id: string) => `${API_BASE_URL}/users/${id}`,
     }
 };
