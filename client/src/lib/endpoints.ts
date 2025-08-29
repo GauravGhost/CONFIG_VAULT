@@ -13,5 +13,13 @@ export const endpoints = {
         update: (id: string) => `${API_BASE_URL}/users/${id}`,
         changePassword: `${API_BASE_URL}/users/change-password`,
         delete: (id: string) => `${API_BASE_URL}/users/${id}`,
+    },
+
+    projects: {
+        getAll: `${API_BASE_URL}/projects`,
+        getById: (id: string) => `${API_BASE_URL}/projects/${id}`,
+        create: `${API_BASE_URL}/projects`,
+        update: (id: string) => `${API_BASE_URL}/projects/${id}`,
+        delete: (id: string) => `${API_BASE_URL}/projects/${id}`,
     }
 };

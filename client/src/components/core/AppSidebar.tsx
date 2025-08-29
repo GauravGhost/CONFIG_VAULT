@@ -18,7 +18,7 @@ import { storage } from "@/lib/storage";
 import { ShowAlert } from "../ui/my-alert/my-alert";
 import { toast } from "sonner";
 import Text from "../ui/text";
-import { sidebarItems } from "@/routes/sidebarMapping";
+import { useSidebarItems } from "@/routes/sidebarMapping";
 import { Icon, type IconName } from "../ui/icon";
 import {
   Popover,
@@ -203,6 +203,7 @@ function AppSidebar() {
   const { state, setOpenMobile } = useSidebar();
   const [expandedItems, setExpandedItems] = useState<string[]>([]);
   const [openPopovers, setOpenPopovers] = useState<Record<string, boolean>>({});
+  const sidebarItems = useSidebarItems();
 
   const typewriterConfig = useMemo(() => ({
     text: "CONFIG VAULT",
@@ -276,13 +277,13 @@ function AppSidebar() {
   );
 
   const filteredSidebarItems = useMemo(() => {
-    return sidebarItems.filter((item) => {
+    return sidebarItems.filter((item: MenuItem) => {
       if (item.isActive === false) {
         return false;
       }
 
       if (item.children) {
-        const filteredChildren = item.children.filter(child =>
+        const filteredChildren = item.children.filter((child: MenuItem) =>
           child.isActive !== false
         );
         if (filteredChildren.length === 0) return false;
@@ -290,22 +291,22 @@ function AppSidebar() {
       }
 
       return true;
-    }).map(item => {
+    }).map((item: MenuItem) => {
       if (item.children) {
         return {
           ...item,
-          children: item.children.filter(child =>
+          children: item.children.filter((child: MenuItem) =>
             child.isActive !== false
           )
         };
       }
       return item;
     });
-  }, []);
+  }, [sidebarItems]);
 
   const menuItems = useMemo(
     () =>
-      filteredSidebarItems.map((item) => {
+      filteredSidebarItems.map((item: MenuItem) => {
         let menuContent;
 
         if (item.children) {
