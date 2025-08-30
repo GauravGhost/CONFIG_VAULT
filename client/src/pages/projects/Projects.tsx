@@ -1,7 +1,9 @@
 import { Link } from 'react-router';
 import { useProjects } from '@/hooks/useProjects';
+import SectionWrapper from '@/components/core/wrapper/SectionWrapper';
+import { projectConfig } from '@/constant/page-config/project-config';
 
-export default function Projects() {
+const Projects = () => {
     const { projects, loading, error, refetch } = useProjects();
 
     if (loading) {
@@ -83,3 +85,5 @@ export default function Projects() {
         </div>
     );
 }
+
+export default SectionWrapper(projectConfig.name, Projects, projectConfig.breadcrumb);
