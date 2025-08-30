@@ -6,7 +6,6 @@ import { pageConfig } from "@/constant/page-config";
 import Dashboard from "@/pages/dashboard/Dashboard";
 import Login from "@/pages/login/Login";
 import Profile from "@/pages/profile/Profile";
-import Projects from "@/pages/projects/Projects";
 import ProjectDetail from "@/pages/projects/ProjectDetail";
 import type { RouteObject } from "react-router";
 import NewProject from "@/components/features/project/NewProject";
@@ -33,11 +32,6 @@ export const routeMapping: RouteObjectExtend[] = [
         title: pageConfig.profile.name,
         path: pageConfig.profile.path,
         element: <Profile />
-      },
-      {
-        title: "Projects",
-        path: "/projects",
-        element: <Projects />,
       },
       {
         title: "Create Project",

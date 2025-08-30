@@ -1,7 +1,10 @@
 import type { IconName } from "@/components/ui/icon";
 import { dashboardConfig } from "@/constant/page-config/dashboard-config";
-import { useProjects } from "@/hooks/useProjects";
-import { useMemo } from "react";
+import { usePrivateGetApi } from "@/hooks/useApi";
+import { endpoints } from "@/lib/endpoints";
+import useProjectsStore from "@/store/useProjectsStore";
+import { type Project } from "@config-vault/shared";
+import { useEffect, useMemo } from "react";
 
 interface MenuItem {
     title: string;
@@ -13,8 +16,15 @@ interface MenuItem {
 }
 
 export const useSidebarItems = (): MenuItem[] => {
-    const { projects, loading } = useProjects();
+    const {setProjects, projects} = useProjectsStore();
+    const { loading, data } = usePrivateGetApi<Project[]>(endpoints.projects.getAll)
 
+    useEffect(() => {
+        if (!loading && data) {
+            setProjects(data);
+        }
+    }, [loading, data, setProjects]);
+    
     const sidebarItems: MenuItem[] = useMemo(() => [
         {
             title: dashboardConfig.name,

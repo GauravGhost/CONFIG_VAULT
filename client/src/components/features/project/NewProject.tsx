@@ -11,10 +11,12 @@ import { Textarea } from "@/components/ui/textarea";
 import SectionWrapper from "@/components/core/wrapper/SectionWrapper";
 import { newProjectConfig } from "@/constant/page-config/project-config";
 import { useNavigate } from "react-router";
+import useProjectsStore from "@/store/useProjectsStore";
 
 const NewProject = () => {
     const navigate = useNavigate();
     const { startLoading, stopLoading } = useLoaderStore();
+    const { refreshProjects } = useProjectsStore();
     const projectApi = usePrivatePostApi<Project>();
     const formItemData: FormFieldItem<ProjectCreateFrontend>[] = [
         {
@@ -40,7 +42,8 @@ const NewProject = () => {
     const handleSubmit = async (values: ProjectCreateFrontend) => {
         await projectApi.postData(endpoints.projects.create, values as any, {
             actionCallbacks: {
-                onSuccess: async (data) => {
+                onSuccess: (data) => {
+                    refreshProjects();
                     toast.success("Project created successfully");
                     navigate(`/projects/${data.id}`);
                 },
