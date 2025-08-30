@@ -3,7 +3,6 @@ import { useEffect } from 'react';
 import { useApi } from '@/hooks/useApi';
 import { endpoints } from '@/lib/endpoints';
 import type { Project } from '@config-vault/shared';
-import { projectConfig } from '@/constant/page-config/project-config';
 import SectionWrapper from '@/components/core/wrapper/SectionWrapper';
 import { configurationConfig } from '@/constant/page-config/configuration-config';
 const ProjectDetail = () => {

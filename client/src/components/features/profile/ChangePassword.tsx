@@ -16,7 +16,7 @@ interface ManageUsersProps {
     data: User;
 }
 
-const ChangePassword = ({ open, onOpenChange, data }: ManageUsersProps) => {
+const ChangePassword = ({ open, onOpenChange }: ManageUsersProps) => {
     const changePasswordApi = usePrivatePostApi<User>();
     const { startLoading, stopLoading } = useLoaderStore();
     const formItemData: FormFieldItem<ChangePasswordType>[] = [
