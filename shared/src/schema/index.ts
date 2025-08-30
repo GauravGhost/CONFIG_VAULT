@@ -1,7 +1,7 @@
 import { changePasswordSchema, createUserSchema, updateUserSchema } from "./user-schema";
 import { createProjectSchema, updateProjectSchema } from "./project-schema";
 import { createConfigurationSchema, updateConfigurationSchema } from "./configuration-schema";
-import { createConfigurationHistorySchema, updateConfigurationHistorySchema } from "./configuration-history-schema";
+import { createConfigurationDetailSchema, updateConfigurationDetailSchema } from "./configuration-detail-schema";
 import { createServiceSchema, updateServiceSchema } from "./service-schema";
 import { createTemplateSchema, updateTemplateSchema } from "./template-schema";
 import { createUserSessionSchema, updateUserSessionSchema } from "./user-session-schema";
@@ -13,7 +13,7 @@ export * from "./base-schema";
 export * from "./user-schema";
 export * from "./project-schema";
 export * from "./configuration-schema";
-export * from "./configuration-history-schema";
+export * from "./configuration-detail-schema";
 export * from "./service-schema";
 export * from "./template-schema";
 export * from "./user-session-schema";
@@ -26,7 +26,7 @@ export const schema = {
         user: createUserSchema,
         project: createProjectSchema,
         configuration: createConfigurationSchema,
-        configurationHistory: createConfigurationHistorySchema,
+        configurationDetail: createConfigurationDetailSchema,
         service: createServiceSchema,
         template: createTemplateSchema,
         userSession: createUserSessionSchema,
@@ -38,7 +38,7 @@ export const schema = {
         password: changePasswordSchema,
         project: updateProjectSchema,
         configuration: updateConfigurationSchema,
-        configurationHistory: updateConfigurationHistorySchema,
+        configurationDetail: updateConfigurationDetailSchema,
         service: updateServiceSchema,
         template: updateTemplateSchema,
         userSession: updateUserSessionSchema,

@@ -1,15 +1,12 @@
 import { z } from "zod";
 import { createCrudSchemaTypes, createSchemaTypes } from "../utils/schema-types";
-import { baseModelSchema, fileTypeEnum, environmentEnum, sharingTypeEnum } from "./base-schema";
+import { baseModelSchema, sharingTypeEnum } from "./base-schema";
 
 export const configurationSchema = baseModelSchema.extend({
     project_id: z.string().min(1, "Project ID is required"),
     name: z.string().min(1, "Configuration name is required"),
-    file_type: fileTypeEnum,
     file_path: z.string().min(1, "File path is required"),
     content: z.string().optional(),
-    version: z.number().int().positive().default(1),
-    environment: environmentEnum.default('development'),
     sharing_type: sharingTypeEnum.default('private'),
     share_token: z.string().optional(),
     is_active: z.boolean().default(true),
@@ -18,19 +15,15 @@ export const configurationSchema = baseModelSchema.extend({
 export const createConfigurationSchema = z.object({
     project_id: z.string().min(1, "Project ID is required"),
     name: z.string().min(2, "Configuration name must be at least 2 characters"),
-    file_type: fileTypeEnum,
     file_path: z.string().min(1, "File path is required"),
     content: z.string().optional(),
-    environment: environmentEnum.optional(),
     sharing_type: sharingTypeEnum.optional(),
 });
 
 export const updateConfigurationSchema = z.object({
     name: z.string().min(2, "Configuration name must be at least 2 characters").optional(),
-    file_type: fileTypeEnum.optional(),
     file_path: z.string().min(1, "File path is required").optional(),
     content: z.string().optional(),
-    environment: environmentEnum.optional(),
     sharing_type: sharingTypeEnum.optional(),
     is_active: z.boolean().optional(),
 });

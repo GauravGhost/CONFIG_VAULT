@@ -4,7 +4,7 @@ import { baseModelSchema, userRoleEnum } from "./base-schema";
 
 export const userSchema = baseModelSchema.extend({
     username: z.string().min(1, "Username is required"),
-    email: z.string().min(1, "Email is required"),
+    email: z.string().min(1, "Email is required").optional(),
     password: z.string().min(6, "Password must be at least 6 characters"),
     role: userRoleEnum.default('user'),
     is_active: z.boolean().default(true),
@@ -14,7 +14,7 @@ export const userSchema = baseModelSchema.extend({
 
 export const createUserSchema = z.object({
     username: z.string().min(2, "Username must be at least 2 characters"),
-    email: z.string().min(1, "Email is required"),
+    email: z.string().min(1, "Email is required").optional(),
     password: z.string().min(6, "Password must be at least 6 characters"),
     name: z.string().min(2, "Name must be at least 2 characters").optional(),
     role: userRoleEnum.default("user"),
