@@ -43,7 +43,7 @@ export interface UseApiResult<T, R = DefaultResponseTemplate<T>> {
     reset: () => void;
 }
 
-const getPrivateHeaders = (): Record<string, string> => {
+export const getPrivateHeaders = (): Record<string, string> => {
     const token = typeof window !== 'undefined' ? storage.get('AUTH_TOKEN') : null;
 
     if (token && typeof token === 'string') {
