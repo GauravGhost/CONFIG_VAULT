@@ -7,6 +7,7 @@ import type { User } from "@config-vault/shared";
 import { endpoints } from "@/lib/endpoints";
 import useProfileStore from "@/store/useProfileStore";
 import { Loader } from "@/components/ui/loader";
+import { toast } from "sonner";
 
 const isTokenExpired = (token: string): boolean => {
     try {
@@ -22,29 +23,35 @@ export function PrivateRoute({ children }: Readonly<{ children: ReactNode }>) {
     const { fetch, data, loading, error } = usePrivateGetApi<User>();
     const { setUser, user } = useProfileStore();
 
+    
     useEffect(() => {
         if (user) return;
-
+        
         const token = storage.get<string>('AUTH_TOKEN');
         
         if (!token || isTokenExpired(token)) {
             storage.remove('AUTH_TOKEN');
             return;
         }
-
+        
         fetch(endpoints.users.getCurrent);
     }, [user, fetch]);
-
+    
     useEffect(() => {
         if (data) setUser(data);
     }, [data, setUser]);
-
+    
     const isAuthenticated = user || data;
     const shouldRedirect = !loading && !isAuthenticated && (error || !storage.get<string>('AUTH_TOKEN'));
-
+    
     if (loading) return <Loader fullScreen />;
     if (shouldRedirect) return <Navigate to="/login" state={{ from: location }} replace />;
     if (isAuthenticated) return children;
-
+    
+    if(error){
+        toast.error("Failed to fetch user data");
+        storage.remove('AUTH_TOKEN');
+    }
+    
     return <Loader fullScreen />;
 }

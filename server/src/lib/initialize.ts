@@ -1,6 +1,7 @@
 import { SERVER_CONFIG } from "../config/server-config.js";
 import { SQLiteRepository } from "../repository/base-repository/sqlite-repository.js";
 import UserRepository from "../repository/user-repository.js";
+import UserService from "../services/user-service.js";
 import { MigrationManager } from "./migration-manager.js";
 
 export async function init() {
@@ -25,9 +26,10 @@ export async function init() {
 
 export async function seedData() {
     const userRepo = new UserRepository();
+    const userService = new UserService();
     const isAdminExists = await userRepo.findOne({ role: 'admin' });
     if (!isAdminExists) {
-        await userRepo.create({
+        await userService.createUser({
             username: 'admin',
             password: "admin123",
             role: "admin",
