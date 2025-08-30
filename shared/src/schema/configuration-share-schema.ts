@@ -43,8 +43,5 @@ const mainConfigurationShareSchemaTypes = createSchemaTypes(configurationShareSc
 const configurationShareSchemaTypes = createCrudSchemaTypes(createConfigurationShareSchema, updateConfigurationShareSchema);
 
 export type ConfigurationShare = z.infer<typeof configurationShareSchema>;
-export type ConfigurationShareZod = typeof mainConfigurationShareSchemaTypes.Zod;
 export type ConfigurationShareCreate = z.infer<typeof createConfigurationShareSchema>;
-export type ConfigurationShareCreateZod = typeof configurationShareSchemaTypes.Create.Zod;
 export type ConfigurationShareUpdate = z.infer<typeof updateConfigurationShareSchema>;
-export type ConfigurationShareUpdateZod = typeof configurationShareSchemaTypes.Update.Zod;

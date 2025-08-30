@@ -45,8 +45,5 @@ const mainServiceSchemaTypes = createSchemaTypes(serviceSchema);
 const serviceSchemaTypes = createCrudSchemaTypes(createServiceSchema, updateServiceSchema);
 
 export type Service = z.infer<typeof serviceSchema>;
-export type ServiceZod = typeof mainServiceSchemaTypes.Zod;
 export type ServiceCreate = z.infer<typeof createServiceSchema>;
-export type ServiceCreateZod = typeof serviceSchemaTypes.Create.Zod;
 export type ServiceUpdate = z.infer<typeof updateServiceSchema>;
-export type ServiceUpdateZod = typeof serviceSchemaTypes.Update.Zod;

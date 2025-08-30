@@ -27,8 +27,5 @@ const mainConfigurationAccessLogSchemaTypes = createSchemaTypes(configurationAcc
 const configurationAccessLogSchemaTypes = createCrudSchemaTypes(createConfigurationAccessLogSchema, updateConfigurationAccessLogSchema);
 
 export type ConfigurationAccessLog = z.infer<typeof configurationAccessLogSchema>;
-export type ConfigurationAccessLogZod = typeof mainConfigurationAccessLogSchemaTypes.Zod;
 export type ConfigurationAccessLogCreate = z.infer<typeof createConfigurationAccessLogSchema>;
-export type ConfigurationAccessLogCreateZod = typeof configurationAccessLogSchemaTypes.Create.Zod;
 export type ConfigurationAccessLogUpdate = z.infer<typeof updateConfigurationAccessLogSchema>;
-export type ConfigurationAccessLogUpdateZod = typeof configurationAccessLogSchemaTypes.Update.Zod;

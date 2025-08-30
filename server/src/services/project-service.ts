@@ -1,4 +1,4 @@
-import type { Project } from "@config-vault/shared";
+import type { Project, ProjectCreate, User } from "@config-vault/shared";
 import ProjectRepository from "../repository/project-repository.js";
 import ApiError from "../utils/error.js";
 import status from "http-status";
@@ -20,7 +20,13 @@ class ProjectService {
         return project;
     }
 
-    public async createProject(data: Project): Promise<Project> {
+    public async createProject(data: ProjectCreate, user: User): Promise<Project> {
+        if(!user.id){
+            throw new ApiError("User not found", status.UNAUTHORIZED);
+        }
+
+        data.user_id = user.id;
+        data.is_active = data.is_active ?? true;
         const project = await this.projectRepository.create(data);
         return project;
     }

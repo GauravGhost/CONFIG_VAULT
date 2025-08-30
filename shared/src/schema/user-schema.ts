@@ -41,9 +41,6 @@ const mainUserSchemaTypes = createSchemaTypes(userSchema);
 const userSchemaTypes = createCrudSchemaTypes(createUserSchema, updateUserSchema);
 
 export type User = z.infer<typeof userSchema>;
-export type UserZod = typeof mainUserSchemaTypes.Zod;
 export type UserCreate = z.infer<typeof createUserSchema>;
-export type UserCreateZod = typeof userSchemaTypes.Create.Zod;
 export type UserUpdate = z.infer<typeof updateUserSchema>;
-export type UserUpdateZod = typeof userSchemaTypes.Update.Zod;
 export type ChangePassword = z.infer<typeof changePasswordSchema>;

@@ -6,11 +6,12 @@ import { Drawer, DrawerContent, DrawerTrigger } from "@/components/ui/drawer"
 import { HoverCard, HoverCardContent, HoverCardTrigger } from "@/components/ui/hover-card"
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip"
 import { Button } from "@/components/ui/button"
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { ScrollArea } from "@/components/ui/scroll-area"
 import type { ReactNode, ReactElement } from "react"
 import { cn } from "@/lib/utils"
 
-type DisplayMode = "popover" | "sheet" | "drawer" | "dialog" | "hover-card" | "tooltip"
+type DisplayMode = "popover" | "sheet" | "drawer" | "dialog" | "hover-card" | "tooltip" | "card" | "page"
 
 type DisplaySize = "sm" | "md" | "lg" | "xl" | "full" | "auto"
 
@@ -90,6 +91,22 @@ const sizeClasses = {
     lg: "max-w-[400px]",
     xl: "max-w-[500px]",
     full: "max-w-[95vw]",
+    auto: ""
+  },
+  card: {
+    sm: "max-w-sm",
+    md: "max-w-2xl",
+    lg: "max-w-4xl",
+    xl: "max-w-6xl",
+    full: "max-w-full",
+    auto: ""
+  },
+  page: {
+    sm: "",
+    md: "",
+    lg: "",
+    xl: "",
+    full: "",
     auto: ""
   }
 }
@@ -244,6 +261,9 @@ const DisplayWrapper = ({
 
   const getSizeClass = () => {
     if (width || height) return ""
+    if (mode === 'page' || mode === 'card') {
+      return sizeClasses[mode]?.[size] || ""
+    }
     return sizeClasses[mode]?.[size] || ""
   }
 
@@ -362,6 +382,36 @@ const DisplayWrapper = ({
             {renderContent()}
           </DialogContent>
         </Dialog>
+      )
+
+    case 'card':
+      return (
+        <Card className={cn(getSizeClass(), className)} style={getCustomStyle()}>
+          {(title || description) && (
+            <CardHeader>
+              {title && <CardTitle>{title}</CardTitle>}
+              {description && <CardDescription>{description}</CardDescription>}
+            </CardHeader>
+          )}
+          <CardContent className={cn(contentClassName)}>
+            {children}
+          </CardContent>
+        </Card>
+      )
+
+    case 'page':
+      return (
+        <div className={cn(getSizeClass(), className)} style={getCustomStyle()}>
+          {(title || description) && (
+            <div className="space-y-2 pb-4">
+              {title && <h2 className="text-2xl font-bold tracking-tight">{title}</h2>}
+              {description && <p className="text-muted-foreground">{description}</p>}
+            </div>
+          )}
+          <div className={cn(contentClassName)}>
+            {children}
+          </div>
+        </div>
       )
 
     default:

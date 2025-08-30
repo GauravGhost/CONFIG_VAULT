@@ -27,19 +27,27 @@ export const useSidebarItems = (): MenuItem[] => {
             url: "/projects",
             icon: "FolderOpen",
             isActive: true,
-            children: loading ? [
+            children: [
                 {
-                    title: "Loading...",
-                    url: "#",
-                    icon: "Loader",
-                    isActive: false,
-                }
-            ] : projects?.map(project => ({
-                title: project.name,
-                url: `/projects/${project.id}`,
-                icon: project.is_active ? "Folder" : "FolderX",
-                isActive: project.is_active,
-            })) || []
+                    title: "Create New Project",
+                    url: "/projects/create",
+                    icon: "PlusCircle",
+                    isActive: true,
+                },
+                ...(loading ? [
+                    {
+                        title: "Loading...",
+                        url: "#",
+                        icon: "Loader" as IconName,
+                        isActive: false,
+                    }
+                ] : projects?.map(project => ({
+                    title: project.name,
+                    url: `/projects/${project.id}`,
+                    icon: (project.is_active ? "Folder" : "FolderX") as IconName,
+                    isActive: project.is_active,
+                })) || [])
+            ]
         }
     ], [projects, loading]);
 

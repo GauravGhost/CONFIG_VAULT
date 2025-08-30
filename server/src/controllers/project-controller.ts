@@ -31,12 +31,15 @@ class ProjectController {
 
     public createProject = async (req: Request, res: Response): Promise<void> => {
         const projectData = req.body;
-
+        const user = req.user;
+        if(!user){
+            throw new ApiError("User not found", status.UNAUTHORIZED);
+        }
         if (!projectData.name || !projectData.description) {
             throw new ApiError("Project name and description are required", status.BAD_REQUEST);
         }
 
-        const newProject = await this.projectService.createProject(projectData);
+        const newProject = await this.projectService.createProject(projectData, user);
 
         successResponse.data = newProject;
         res.status(201).json(successResponse);

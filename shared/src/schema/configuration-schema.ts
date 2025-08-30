@@ -32,8 +32,5 @@ const mainConfigurationSchemaTypes = createSchemaTypes(configurationSchema);
 const configurationSchemaTypes = createCrudSchemaTypes(createConfigurationSchema, updateConfigurationSchema);
 
 export type Configuration = z.infer<typeof configurationSchema>;
-export type ConfigurationZod = typeof mainConfigurationSchemaTypes.Zod;
 export type ConfigurationCreate = z.infer<typeof createConfigurationSchema>;
-export type ConfigurationCreateZod = typeof configurationSchemaTypes.Create.Zod;
 export type ConfigurationUpdate = z.infer<typeof updateConfigurationSchema>;
-export type ConfigurationUpdateZod = typeof configurationSchemaTypes.Update.Zod;
