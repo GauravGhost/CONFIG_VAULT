@@ -8,14 +8,16 @@ export interface Migration {
 export const migrations: Migration[] = [
     {
         version: 1,
-        description: 'Initial schema creation',
+        description: 'Complete initial schema creation',
         up: `
 -- Users table
 CREATE TABLE IF NOT EXISTS users (
     id TEXT PRIMARY KEY DEFAULT (lower(hex(randomblob(4))) || '-' || lower(hex(randomblob(2))) || '-4' || substr(lower(hex(randomblob(2))),2) || '-' || substr('89ab',abs(random()) % 4 + 1, 1) || substr(lower(hex(randomblob(2))),2) || '-' || lower(hex(randomblob(6)))),
     username TEXT UNIQUE NOT NULL,
-    email TEXT UNIQUE NOT NULL,
+    email TEXT UNIQUE NULL,
     password TEXT NOT NULL,
+    name TEXT,
+    avatar_url TEXT,
     role TEXT DEFAULT 'user',
     is_active BOOLEAN DEFAULT 1,
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
@@ -38,11 +40,8 @@ CREATE TABLE IF NOT EXISTS configurations (
     id TEXT PRIMARY KEY DEFAULT (lower(hex(randomblob(4))) || '-' || lower(hex(randomblob(2))) || '-4' || substr(lower(hex(randomblob(2))),2) || '-' || substr('89ab',abs(random()) % 4 + 1, 1) || substr(lower(hex(randomblob(2))),2) || '-' || lower(hex(randomblob(6)))),
     project_id TEXT NOT NULL REFERENCES projects(id) ON DELETE CASCADE,
     name TEXT NOT NULL,
-    file_type TEXT NOT NULL,
     file_path TEXT NOT NULL,
     content TEXT,
-    version INTEGER DEFAULT 1,
-    environment TEXT DEFAULT 'development',
     sharing_type TEXT DEFAULT 'private',
     share_token TEXT UNIQUE,
     is_active BOOLEAN DEFAULT 1,
@@ -50,15 +49,15 @@ CREATE TABLE IF NOT EXISTS configurations (
     updated_at DATETIME DEFAULT CURRENT_TIMESTAMP
 );
 
--- Configuration history/versions
-CREATE TABLE IF NOT EXISTS configuration_history (
+-- Configuration detail table for environment-specific configurations
+CREATE TABLE IF NOT EXISTS configuration_detail (
     id TEXT PRIMARY KEY DEFAULT (lower(hex(randomblob(4))) || '-' || lower(hex(randomblob(2))) || '-4' || substr(lower(hex(randomblob(2))),2) || '-' || substr('89ab',abs(random()) % 4 + 1, 1) || substr(lower(hex(randomblob(2))),2) || '-' || lower(hex(randomblob(6)))),
-    config_id TEXT NOT NULL REFERENCES configurations(id) ON DELETE CASCADE,
-    content TEXT NOT NULL,
-    version INTEGER NOT NULL,
-    change_description TEXT,
-    created_by TEXT NOT NULL REFERENCES users(id),
-    created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+    configuration_id TEXT NOT NULL REFERENCES configurations(id) ON DELETE CASCADE,
+    environment TEXT NOT NULL,
+    env TEXT NOT NULL,
+    code TEXT NOT NULL,
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    updated_at DATETIME DEFAULT CURRENT_TIMESTAMP
 );
 
 -- Services/endpoints table
@@ -77,28 +76,6 @@ CREATE TABLE IF NOT EXISTS services (
     environment TEXT DEFAULT 'development',
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
     updated_at DATETIME DEFAULT CURRENT_TIMESTAMP
-);
-
--- Templates table
-CREATE TABLE IF NOT EXISTS templates (
-    id TEXT PRIMARY KEY DEFAULT (lower(hex(randomblob(4))) || '-' || lower(hex(randomblob(2))) || '-4' || substr(lower(hex(randomblob(2))),2) || '-' || substr('89ab',abs(random()) % 4 + 1, 1) || substr(lower(hex(randomblob(2))),2) || '-' || lower(hex(randomblob(6)))),
-    name TEXT NOT NULL,
-    description TEXT,
-    file_type TEXT NOT NULL,
-    content TEXT NOT NULL,
-    is_public BOOLEAN DEFAULT 0,
-    created_by TEXT REFERENCES users(id),
-    usage_count INTEGER DEFAULT 0,
-    created_at DATETIME DEFAULT CURRENT_TIMESTAMP
-);
-
--- User sessions
-CREATE TABLE IF NOT EXISTS user_sessions (
-    id TEXT PRIMARY KEY DEFAULT (lower(hex(randomblob(4))) || '-' || lower(hex(randomblob(2))) || '-4' || substr(lower(hex(randomblob(2))),2) || '-' || substr('89ab',abs(random()) % 4 + 1, 1) || substr(lower(hex(randomblob(2))),2) || '-' || lower(hex(randomblob(6)))),
-    user_id TEXT NOT NULL REFERENCES users(id) ON DELETE CASCADE,
-    token_hash TEXT NOT NULL,
-    expires_at DATETIME NOT NULL,
-    created_at DATETIME DEFAULT CURRENT_TIMESTAMP
 );
 
 -- Configuration sharing table
@@ -137,28 +114,28 @@ CREATE TABLE IF NOT EXISTS schema_migrations (
 
 -- Indexes
 CREATE INDEX IF NOT EXISTS idx_configurations_project_id ON configurations(project_id);
-CREATE INDEX IF NOT EXISTS idx_configurations_file_type ON configurations(file_type);
 CREATE INDEX IF NOT EXISTS idx_configurations_sharing_type ON configurations(sharing_type);
 CREATE INDEX IF NOT EXISTS idx_configurations_share_token ON configurations(share_token);
+CREATE INDEX IF NOT EXISTS idx_configuration_detail_config_id ON configuration_detail(configuration_id);
+CREATE INDEX IF NOT EXISTS idx_configuration_detail_environment ON configuration_detail(environment);
 CREATE INDEX IF NOT EXISTS idx_services_project_id ON services(project_id);
-CREATE INDEX IF NOT EXISTS idx_config_history_config_id ON configuration_history(config_id);
 CREATE INDEX IF NOT EXISTS idx_config_shares_config_id ON configuration_shares(config_id);
 CREATE INDEX IF NOT EXISTS idx_config_shares_shared_with ON configuration_shares(shared_with_user_id);
 CREATE INDEX IF NOT EXISTS idx_config_shares_email ON configuration_shares(shared_with_email);
 CREATE INDEX IF NOT EXISTS idx_config_access_logs_config_id ON configuration_access_logs(config_id);
 CREATE INDEX IF NOT EXISTS idx_config_access_logs_accessed_by ON configuration_access_logs(accessed_by);
+        `,
+        down: `
+-- Drop all tables in reverse dependency order
+DROP TABLE IF EXISTS configuration_access_logs;
+DROP TABLE IF EXISTS configuration_shares;
+DROP TABLE IF EXISTS user_sessions;
+DROP TABLE IF EXISTS services;
+DROP TABLE IF EXISTS configuration_detail;
+DROP TABLE IF EXISTS configurations;
+DROP TABLE IF EXISTS projects;
+DROP TABLE IF EXISTS users;
+DROP TABLE IF EXISTS schema_migrations;
         `
-    },
-    {
-        version: 2,
-        description: 'Add avatar_url field to users table',
-        up: 'ALTER TABLE users ADD COLUMN avatar_url TEXT;',
-        down: 'ALTER TABLE users DROP COLUMN avatar_url;'
-    },
-    {
-        version: 3,
-        description: 'Add name field to users table',
-        up: 'ALTER TABLE users ADD COLUMN name TEXT;',
-        down: 'ALTER TABLE users DROP COLUMN name;'
     }
 ];
