@@ -16,14 +16,14 @@ export const createConfigurationDetailSchema = z.object({
 });
 
 export const createConfigurationDetailSchemaFrontend = z.object({
-    environment: environmentEnum,
+    environment: environmentEnum.default("development").optional(),
     code: z.string().min(1, "Code is required"),
-    env: z.string().min(1, "Environment name is required").optional(),
+    env: z.string().optional(),
 });
 
 export const updateConfigurationDetailSchema = z.object({
     environment: environmentEnum.optional(),
-    env: z.string().min(1, "Environment name is required").optional(),
+    env: z.string().min(1, "Environment Variable is required").optional(),
     code: z.string().min(1, "Code is required").optional(),
 });
 

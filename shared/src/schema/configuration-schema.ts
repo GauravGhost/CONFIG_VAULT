@@ -1,6 +1,6 @@
 import { z } from "zod";
 import { baseModelSchema, fileTypeEnum, sharingTypeEnum } from "./base-schema";
-import { createConfigurationDetailSchema, createConfigurationDetailSchemaFrontend } from "./configuration-detail-schema";
+import { createConfigurationDetailSchemaFrontend } from "./configuration-detail-schema";
 
 export const configurationSchema = baseModelSchema.extend({
     project_id: z.string().min(1, "Project ID is required"),
