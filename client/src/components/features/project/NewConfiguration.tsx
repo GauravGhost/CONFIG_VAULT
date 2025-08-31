@@ -4,7 +4,7 @@ import { Input } from '@/components/ui/input';
 import type { FormFieldItem } from '@/components/ui/my-form';
 import MyForm from '@/components/ui/my-form';
 import { Textarea } from '@/components/ui/textarea';
-import MyCombobox, { type ComboboxItem } from '@/components/ui/my-combobox/MyCombobox';
+import MyCombobox from '@/components/ui/my-combobox/MyCombobox';
 import { usePrivatePostApi } from '@/hooks/useApi';
 import { endpoints } from '@/lib/endpoints';
 import useLoaderStore from '@/store/useLoaderStore';
@@ -12,6 +12,8 @@ import { environmentEnum, fileTypeEnum, schema, sharingTypeEnum, type Configurat
 import { useParams } from 'react-router';
 import { toast } from 'sonner';
 import { formatToSentenceCase } from '@/lib/utils';
+import TextEditor from '@/components/editor/TextEditor';
+import Editor, { type OnMount } from '@monaco-editor/react';
 
 const NewConfiguration = () => {
   const { startLoading, stopLoading } = useLoaderStore();
@@ -32,7 +34,9 @@ const NewConfiguration = () => {
     value: option,
     label: formatToSentenceCase(option)
   }));
-
+  const handleEditorDidMount = (editor: Parameters<OnMount>[0]) => {
+    editor.focus();
+  };
   const formItemData: FormFieldItem<ConfigurationWithDetailCreate>[] = [
     {
       label: "Name",
@@ -51,15 +55,15 @@ const NewConfiguration = () => {
         width: "1/2"
       },
       render: ({ field }) => {
-        
+
         return (
           <MyCombobox
-          items={sharingTypeItems}
-          value={field.value as string}
-          onValueChange={field.onChange}
-          placeholder="Select sharing type"
-          searchPlaceholder="Search sharing types..."
-          showSearch={false}
+            items={sharingTypeItems}
+            value={field.value as string}
+            onValueChange={field.onChange}
+            placeholder="Select sharing type"
+            searchPlaceholder="Search sharing types..."
+            showSearch={false}
           />
         );
       }
@@ -71,7 +75,10 @@ const NewConfiguration = () => {
         row: 1,
         width: "full"
       },
-      render: ({ field }) => <Textarea placeholder="Enter base configuration content (optional)" {...field} value={field.value as string} />
+      render: ({ field }) => <TextEditor
+        content={field.value as string}
+        onChange={field.onChange}
+      />
     },
     {
       label: "File Type",
@@ -123,7 +130,27 @@ const NewConfiguration = () => {
         row: 3,
         width: "1/2"
       },
-      render: ({ field }) => <Textarea placeholder="Enter environment (optional)" {...field} value={field.value as string} />
+      render: ({ field }) =>
+        <div className="h-full overflow-auto">
+
+          <Editor
+            height="100%"
+            language={"yaml"}
+            theme={"vs-dark"}
+            value={field.value as string}
+            onChange={field.onChange}
+            onMount={handleEditorDidMount}
+            options={{
+              padding: { top: 8 },
+              minimap: { enabled: false },
+              fontSize: 14,
+              lineNumbers: 'on',
+              roundedSelection: false,
+              scrollBeyondLastLine: true,
+              automaticLayout: true,
+            }}
+          />
+        </div>
     },
   ]
   const handleSubmit = async (values: ConfigurationWithDetailCreate) => {
@@ -167,6 +194,8 @@ const NewConfiguration = () => {
           onSubmit={handleSubmit}
           buttonActions={<Button type="submit" className="ml-auto block">Create</Button>}
         />
+
+
       </DisplayWrapper>
     </div>
   )
