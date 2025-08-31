@@ -120,7 +120,7 @@ interface MyFormProps<TFormData extends FieldValues = FieldValues> {
     onSubmit: (values: TFormData) => void | Promise<void>;
     buttonActions?: React.ReactNode;
     submitButtonText?: string;
-    maxHeight?: string;
+    maxHeight?: string | null;
     stepIndicator?: StepIndicatorConfig;
     mode?: FormMode;
 }
