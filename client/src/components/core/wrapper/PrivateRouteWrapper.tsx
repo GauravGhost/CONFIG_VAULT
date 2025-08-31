@@ -41,6 +41,10 @@ export function PrivateRoute({ children }: Readonly<{ children: ReactNode }>) {
         if (data) setUser(data);
     }, [data, setUser]);
     
+    if(error){
+        toast.error("Failed to fetch user data");
+        storage.remove('AUTH_TOKEN');
+    }
     const isAuthenticated = user || data;
     const shouldRedirect = !loading && !isAuthenticated && (error || !storage.get<string>('AUTH_TOKEN'));
     
@@ -48,10 +52,6 @@ export function PrivateRoute({ children }: Readonly<{ children: ReactNode }>) {
     if (shouldRedirect) return <Navigate to="/login" state={{ from: location }} replace />;
     if (isAuthenticated) return children;
     
-    if(error){
-        toast.error("Failed to fetch user data");
-        storage.remove('AUTH_TOKEN');
-    }
     
     return <Loader fullScreen />;
 }

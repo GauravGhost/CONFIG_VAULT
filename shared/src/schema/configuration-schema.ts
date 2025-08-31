@@ -1,11 +1,10 @@
 import { z } from "zod";
-import { createCrudSchemaTypes, createSchemaTypes } from "../utils/schema-types";
 import { baseModelSchema, sharingTypeEnum } from "./base-schema";
 
 export const configurationSchema = baseModelSchema.extend({
     project_id: z.string().min(1, "Project ID is required"),
     name: z.string().min(1, "Configuration name is required"),
-    file_path: z.string().min(1, "File path is required"),
+    file_type: z.string().min(1, "File type is required"),
     content: z.string().optional(),
     sharing_type: sharingTypeEnum.default('private'),
     share_token: z.string().optional(),
@@ -15,21 +14,18 @@ export const configurationSchema = baseModelSchema.extend({
 export const createConfigurationSchema = z.object({
     project_id: z.string().min(1, "Project ID is required"),
     name: z.string().min(2, "Configuration name must be at least 2 characters"),
-    file_path: z.string().min(1, "File path is required"),
+    file_type: z.string().min(1, "File type is required"),
     content: z.string().optional(),
     sharing_type: sharingTypeEnum.optional(),
 });
 
 export const updateConfigurationSchema = z.object({
     name: z.string().min(2, "Configuration name must be at least 2 characters").optional(),
-    file_path: z.string().min(1, "File path is required").optional(),
+    file_type: z.string().min(1, "File type is required").optional(),
     content: z.string().optional(),
     sharing_type: sharingTypeEnum.optional(),
     is_active: z.boolean().optional(),
 });
-
-const mainConfigurationSchemaTypes = createSchemaTypes(configurationSchema);
-const configurationSchemaTypes = createCrudSchemaTypes(createConfigurationSchema, updateConfigurationSchema);
 
 export type Configuration = z.infer<typeof configurationSchema>;
 export type ConfigurationCreate = z.infer<typeof createConfigurationSchema>;

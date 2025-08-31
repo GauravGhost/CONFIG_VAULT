@@ -40,7 +40,7 @@ CREATE TABLE IF NOT EXISTS configurations (
     id TEXT PRIMARY KEY DEFAULT (lower(hex(randomblob(4))) || '-' || lower(hex(randomblob(2))) || '-4' || substr(lower(hex(randomblob(2))),2) || '-' || substr('89ab',abs(random()) % 4 + 1, 1) || substr(lower(hex(randomblob(2))),2) || '-' || lower(hex(randomblob(6)))),
     project_id TEXT NOT NULL REFERENCES projects(id) ON DELETE CASCADE,
     name TEXT NOT NULL,
-    file_path TEXT NOT NULL,
+    file_type TEXT NOT NULL,
     content TEXT,
     sharing_type TEXT DEFAULT 'private',
     share_token TEXT UNIQUE,
