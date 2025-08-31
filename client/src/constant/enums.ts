@@ -3,6 +3,13 @@ export const storageKeys = {
     AUTH_TOKEN: "auth-token"
 } as const;
 
+export const CODE_EDITOR_THEME = {
+    "vs-dark": "vs-dark",
+    "light": "light",
+    "hc-black": "hc-black",
+    "hc-light": "hc-light",
+}
+
 export const colorTheme = {
     red: {
         text: "text-red-800 dark:text-red-300",

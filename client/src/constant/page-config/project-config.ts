@@ -28,3 +28,15 @@ export const newProjectConfig: PageConfig = {
         { id: 3, label: `New ${projectName}`, url: `${projectPath}/create`, icon: projectIcon }
     ]
 };
+
+export const newConfigurationConfig: PageConfig = {
+    name: `New Configuration`,
+    icon: "Cog",
+    path: `/project/:id/configuration`,
+    isActive: true,
+    breadcrumb: [
+        rootConfig.baseBreadcrumb,
+        { id: 2, label: projectName, url: projectPath, icon: projectIcon },
+        { id: 3, label: `New Configuration`, url: `/project/${projectName}/configuration/create`, icon: "Cog" }
+    ]
+};

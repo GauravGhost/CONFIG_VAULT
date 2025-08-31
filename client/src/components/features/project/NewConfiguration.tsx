@@ -3,23 +3,29 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import type { FormFieldItem } from '@/components/ui/my-form';
 import MyForm from '@/components/ui/my-form';
-import { Textarea } from '@/components/ui/textarea';
 import MyCombobox from '@/components/ui/my-combobox/MyCombobox';
 import { usePrivatePostApi } from '@/hooks/useApi';
 import { endpoints } from '@/lib/endpoints';
 import useLoaderStore from '@/store/useLoaderStore';
 import { environmentEnum, fileTypeEnum, schema, sharingTypeEnum, type Configuration, type ConfigurationWithDetailCreate } from '@config-vault/shared';
-import { useParams } from 'react-router';
+import { useNavigate, useParams } from 'react-router';
 import { toast } from 'sonner';
 import { formatToSentenceCase } from '@/lib/utils';
 import TextEditor from '@/components/editor/TextEditor';
 import Editor, { type OnMount } from '@monaco-editor/react';
+import SectionWrapper from '@/components/core/wrapper/SectionWrapper';
+import { newConfigurationConfig } from '@/constant/page-config/project-config';
+import { useTheme } from '@/components/theme-provider';
+import { CODE_EDITOR_THEME } from '@/constant/enums';
 
 const NewConfiguration = () => {
+  const { id } = useParams();
+  const { theme } = useTheme();
+  const navigate = useNavigate();
   const { startLoading, stopLoading } = useLoaderStore();
   const projectApi = usePrivatePostApi<Configuration>();
-  const { id } = useParams();
-
+  
+  console.log(theme);
   const envTypeItems = environmentEnum.options.map(option => ({
     value: option,
     label: formatToSentenceCase(option)
@@ -121,21 +127,39 @@ const NewConfiguration = () => {
         row: 3,
         width: "1/2"
       },
-      render: ({ field }) => <Textarea placeholder="Enter configuration code" {...field} value={field.value as string} rows={10} />
+      render: ({ field, form }) =>
+        <div className="overflow-auto" style={{ height: '240px' }}>
+          <Editor
+            height="100%"
+            language={form.watch("file_type") || "yaml"}
+            theme={theme == "dark" ? CODE_EDITOR_THEME['vs-dark'] : CODE_EDITOR_THEME['light']}
+            value={field.value as string}
+            onChange={field.onChange}
+            onMount={handleEditorDidMount}
+            options={{
+              padding: { top: 8 },
+              minimap: { enabled: false },
+              fontSize: 14,
+              lineNumbers: 'on',
+              roundedSelection: false,
+              scrollBeyondLastLine: true,
+              automaticLayout: true,
+            }}
+          />
+        </div>
     },
     {
-      label: "Environment Name (Optional)",
+      label: "Environment Variable (Optional)",
       name: "configuration_details.env",
       layout: {
         row: 3,
         width: "1/2"
       },
       render: ({ field }) =>
-        <div className="h-full overflow-auto">
-
+        <div className="overflow-auto" style={{ height: '240px' }}>
           <Editor
             height="100%"
-            language={"yaml"}
+            language={"txt"}
             theme={"vs-dark"}
             value={field.value as string}
             onChange={field.onChange}
@@ -158,6 +182,7 @@ const NewConfiguration = () => {
       actionCallbacks: {
         onSuccess: () => {
           toast.success("Configuration created successfully");
+          navigate(-1);
         },
         onError: (error) => toast.error(error ?? "Something went wrong"),
         onLoadingStart: () => startLoading(),
@@ -166,12 +191,11 @@ const NewConfiguration = () => {
     });
   };
   return (
-    <div className="flex justify-center pt-10">
+    <div className="flex justify-center">
       <DisplayWrapper
         mode="card"
         title={"New Configuration"}
-        description={"Create a new configuration"}
-        size="lg"
+        size="full"
 
         className="w-full"
       >
@@ -201,4 +225,4 @@ const NewConfiguration = () => {
   )
 }
 
-export default NewConfiguration
+export default SectionWrapper("new-configuration", NewConfiguration, newConfigurationConfig.breadcrumb)
