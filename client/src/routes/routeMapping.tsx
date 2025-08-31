@@ -8,7 +8,8 @@ import Login from "@/pages/login/Login";
 import Profile from "@/pages/profile/Profile";
 import ProjectDetail from "@/pages/projects/ProjectDetail";
 import type { RouteObject } from "react-router";
-import NewProject from "@/components/features/project/NewProject";
+import NewProject from "@/pages/projects/NewProject";
+import NewConfiguration from "@/components/features/project/NewConfiguration";
 
 export type RouteObjectExtend = RouteObject & {
   title: string;
@@ -42,6 +43,11 @@ export const routeMapping: RouteObjectExtend[] = [
         title: "Project Detail",
         path: "/projects/:id",
         element: <ProjectDetail />,
+      },
+      {
+        title: "Project Configuration",
+        path: "/projects/:id/configuration",
+        element: <NewConfiguration />,
       }
     ],
   },

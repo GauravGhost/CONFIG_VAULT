@@ -1,5 +1,4 @@
 import { z } from "zod";
-import { createCrudSchemaTypes, createSchemaTypes } from "../utils/schema-types";
 import { baseModelSchema, environmentEnum } from "./base-schema";
 
 export const configurationDetailSchema = baseModelSchema.extend({
@@ -12,8 +11,14 @@ export const configurationDetailSchema = baseModelSchema.extend({
 export const createConfigurationDetailSchema = z.object({
     configuration_id: z.string().min(1, "Configuration ID is required"),
     environment: environmentEnum,
-    env: z.string().min(1, "Environment name is required"),
     code: z.string().min(1, "Code is required"),
+    env: z.string().min(1, "Environment name is required").optional(),
+});
+
+export const createConfigurationDetailSchemaFrontend = z.object({
+    environment: environmentEnum,
+    code: z.string().min(1, "Code is required"),
+    env: z.string().min(1, "Environment name is required").optional(),
 });
 
 export const updateConfigurationDetailSchema = z.object({
@@ -22,9 +27,7 @@ export const updateConfigurationDetailSchema = z.object({
     code: z.string().min(1, "Code is required").optional(),
 });
 
-const mainConfigurationDetailSchemaTypes = createSchemaTypes(configurationDetailSchema);
-const configurationDetailSchemaTypes = createCrudSchemaTypes(createConfigurationDetailSchema, updateConfigurationDetailSchema);
-
+export type ConfigurationDetailFrontend = z.infer<typeof createConfigurationDetailSchemaFrontend>;
 export type ConfigurationDetail = z.infer<typeof configurationDetailSchema>;
 export type ConfigurationDetailCreate = z.infer<typeof createConfigurationDetailSchema>;
 export type ConfigurationDetailUpdate = z.infer<typeof updateConfigurationDetailSchema>;

@@ -1,6 +1,6 @@
 import { changePasswordSchema, createUserSchema, updateUserSchema } from "./user-schema";
 import { createProjectSchema, createProjectSchemaFrontend, updateProjectSchema } from "./project-schema";
-import { createConfigurationSchema, updateConfigurationSchema } from "./configuration-schema";
+import { createConfigurationSchema, createConfigurationSchemaWithDetails, updateConfigurationSchema } from "./configuration-schema";
 import { createConfigurationDetailSchema, updateConfigurationDetailSchema } from "./configuration-detail-schema";
 import { createServiceSchema, updateServiceSchema } from "./service-schema";
 import { createUserSessionSchema, updateUserSessionSchema } from "./user-session-schema";
@@ -25,6 +25,7 @@ export const schema = {
         project: createProjectSchema,
         projectFrontend: createProjectSchemaFrontend,
         configuration: createConfigurationSchema,
+        configurationWithDetail: createConfigurationSchemaWithDetails,
         configurationDetail: createConfigurationDetailSchema,
         service: createServiceSchema,
         userSession: createUserSessionSchema,

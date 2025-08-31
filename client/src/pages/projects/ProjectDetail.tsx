@@ -1,14 +1,30 @@
-import { useParams } from 'react-router';
+import { useNavigate, useParams } from 'react-router';
 import { useEffect } from 'react';
 import { useApi } from '@/hooks/useApi';
 import { endpoints } from '@/lib/endpoints';
 import type { Project } from '@config-vault/shared';
 import SectionWrapper from '@/components/core/wrapper/SectionWrapper';
 import { configurationConfig } from '@/constant/page-config/configuration-config';
+import { Button } from '@/components/ui/button';
+import { Icon } from '@/components/ui/icon';
+
+const ConfigurationActionButton = () => {
+    const { id } = useParams<{ id: string }>();
+    const navigate = useNavigate();
+
+    return (
+        <Button 
+            variant="outline" 
+            onClick={() => navigate(`/projects/${id}/configuration`)}
+        >
+            <Icon name='Plus' />
+        </Button>
+    );
+};
+
 const ProjectDetail = () => {
     const { id } = useParams<{ id: string }>();
     const { data, loading, error, get } = useApi<Project>();
-
     useEffect(() => {
         if (id) {
             get(endpoints.projects.getById(id), {
@@ -91,4 +107,4 @@ const ProjectDetail = () => {
     );
 }
 
-export default SectionWrapper(configurationConfig.name, ProjectDetail, configurationConfig.breadcrumb);
+export default SectionWrapper(configurationConfig.name, ProjectDetail, configurationConfig.breadcrumb, <ConfigurationActionButton />);
