@@ -32,11 +32,23 @@ export const newProjectConfig: PageConfig = {
 export const newConfigurationConfig: PageConfig = {
     name: `New Configuration`,
     icon: "Cog",
-    path: `/project/:id/configuration`,
+    path: `/project/:id/configuration/create`,
     isActive: true,
     breadcrumb: [
         rootConfig.baseBreadcrumb,
         { id: 2, label: projectName, url: projectPath, icon: projectIcon },
         { id: 3, label: `New Configuration`, url: "", icon: "Cog" }
+    ]
+};
+
+export const configurationPreviewConfig: PageConfig = {
+    name: `Configuration Preview`,
+    icon: "Eye",
+    path: `/project/:id/`,
+    isActive: true,
+    breadcrumb: [
+        rootConfig.baseBreadcrumb,
+        { id: 2, label: projectName, url: projectPath, icon: projectIcon },
+        { id: 3, label: `Configuration Preview`, url: "", icon: "Eye" }
     ]
 };

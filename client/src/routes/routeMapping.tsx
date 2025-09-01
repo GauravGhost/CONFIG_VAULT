@@ -6,10 +6,10 @@ import { pageConfig } from "@/constant/page-config";
 import Dashboard from "@/pages/dashboard/Dashboard";
 import Login from "@/pages/login/Login";
 import Profile from "@/pages/profile/Profile";
-import ProjectDetail from "@/pages/projects/ProjectDetail";
 import type { RouteObject } from "react-router";
 import NewProject from "@/pages/projects/NewProject";
-import NewConfiguration from "@/components/features/project/NewConfiguration";
+import NewConfiguration from "@/components/features/project/configuration/NewConfiguration";
+import PreviewConfiguration from "@/components/features/project/configuration/PreviewConfiguration";
 
 export type RouteObjectExtend = RouteObject & {
   title: string;
@@ -42,7 +42,7 @@ export const routeMapping: RouteObjectExtend[] = [
       {
         title: "Project Detail",
         path: "/projects/:id",
-        element: <ProjectDetail />,
+        element: <PreviewConfiguration />,
       },
       {
         title: "Project Configuration",

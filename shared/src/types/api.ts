@@ -1,4 +1,4 @@
-import { User } from "../schema"
+import { Configuration, ConfigurationDetail, User } from "../schema"
 
 export type LoginResponse = {
     user: User;
@@ -8,4 +8,7 @@ export type LoginResponse = {
 export type Login = {
     username: string
     password: string
+}
+export interface ConfigurationWithDetail extends Configuration {
+    configuration_details: ConfigurationDetail[];
 }

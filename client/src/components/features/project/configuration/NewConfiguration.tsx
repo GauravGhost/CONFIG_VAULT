@@ -177,7 +177,7 @@ const NewConfiguration = () => {
     },
   ]
   const handleSubmit = async (values: ConfigurationWithDetailCreate) => {
-    await projectApi.postData(endpoints.configuration.create, values as any, {
+    await projectApi.postData(endpoints.configurations.create, values as any, {
       actionCallbacks: {
         onSuccess: () => {
           toast.success("Configuration created successfully");
