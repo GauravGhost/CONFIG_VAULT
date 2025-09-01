@@ -35,9 +35,6 @@ class ProjectController {
         if(!user){
             throw new ApiError("User not found", status.UNAUTHORIZED);
         }
-        if (!projectData.name || !projectData.description) {
-            throw new ApiError("Project name and description are required", status.BAD_REQUEST);
-        }
 
         const newProject = await this.projectService.createProject(projectData, user);
 
