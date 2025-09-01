@@ -13,16 +13,18 @@ import { Card, CardContent } from "../card"
 import { Icon } from "../icon"
 import { cn } from "@/lib/utils"
 import type { FormFieldItem } from "../my-form"
-import { getGridCols } from "./formUtils."
+import { getGridCols, isFieldRequired } from "./formUtils"
 
 function ArrayField<TFormData extends FieldValues = FieldValues>({
     item,
     form,
-    mode = "edit"
+    mode = "edit",
+    schema
 }: Readonly<{
     item: FormFieldItem<TFormData>;
     form: UseFormReturn<FieldValues>;
     mode?: "edit" | "preview";
+    schema?: any;
 }>) {
     const { fields, append, remove } = useFieldArray({
         control: form.control,
@@ -121,9 +123,14 @@ function ArrayField<TFormData extends FieldValues = FieldValues>({
                                                 content = fieldItem.render({ field, form, index });
                                             }
 
+                                            const isRequired = schema ? isFieldRequired(schema, fieldName) : false;
+
                                             return (
                                                 <FormItem>
-                                                    <FormLabel>{fieldItem.label}</FormLabel>
+                                                    <FormLabel>
+                                                        {fieldItem.label}
+                                                        {mode === "edit" && isRequired && <span style={{ color: "red", marginLeft: '-4px' }}>*</span>}
+                                                    </FormLabel>
                                                     <FormControl>{content}</FormControl>
                                                     {fieldItem.description && (
                                                         <FormDescription>

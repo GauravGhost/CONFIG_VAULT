@@ -37,6 +37,6 @@ export const newConfigurationConfig: PageConfig = {
     breadcrumb: [
         rootConfig.baseBreadcrumb,
         { id: 2, label: projectName, url: projectPath, icon: projectIcon },
-        { id: 3, label: `New Configuration`, url: `/project/${projectName}/configuration/create`, icon: "Cog" }
+        { id: 3, label: `New Configuration`, url: "", icon: "Cog" }
     ]
 };

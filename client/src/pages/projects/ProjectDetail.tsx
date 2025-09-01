@@ -15,7 +15,7 @@ const ConfigurationActionButton = () => {
     return (
         <Button 
             variant="outline" 
-            onClick={() => navigate(`/projects/${id}/configuration`)}
+            onClick={() => navigate(`/projects/${id}/configuration/create`)}
         >
             <Icon name='Plus' />
         </Button>

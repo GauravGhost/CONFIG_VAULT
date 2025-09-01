@@ -46,7 +46,7 @@ export const routeMapping: RouteObjectExtend[] = [
       },
       {
         title: "Project Configuration",
-        path: "/projects/:id/configuration",
+        path: "/projects/:id/configuration/create",
         element: <NewConfiguration />,
       }
     ],

@@ -20,7 +20,7 @@ import ProgressStepIndicator from "./my-form/ProgressStepIndicator"
 import BreadcrumbStepIndicator from "./my-form/BreadcrumbStepIndicator"
 import DotsStepIndicator from "./my-form/DotStepIndicator"
 import ArrayField from "./my-form/ArrayField"
-import { getGridCols } from "./my-form/formUtils."
+import { getGridCols, isFieldRequired } from "./my-form/formUtils"
 
 export interface FormFieldItem<TFormData extends FieldValues = FieldValues> {
     label: string;
@@ -125,26 +125,6 @@ interface MyFormProps<TFormData extends FieldValues = FieldValues> {
     mode?: FormMode;
 }
 
-/**
- * Utility to check if a field is required in the zod schema.
- */
-function isFieldRequired(schema: z.ZodType<any, any, any>, fieldName: string): boolean {
-    if (schema instanceof z.ZodObject) {
-        const shape = schema.shape;
-        if (!shape || !(fieldName in shape)) return false;
-
-        const field = shape[fieldName];
-        if (!field) return false;
-
-        return !(
-            field.isOptional() ??
-            field.isNullable() ??
-            field._def.typeName === "ZodDefault"
-        );
-    }
-
-    return false;
-}
 
 const MyForm = <TFormData extends FieldValues = FieldValues>({
     formSchema,
@@ -279,6 +259,7 @@ const MyForm = <TFormData extends FieldValues = FieldValues>({
                 item={item as any}
                 form={form as UseFormReturn<FieldValues>}
                 mode={mode}
+                schema={formSchema}
             />
         );
     };
