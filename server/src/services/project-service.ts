@@ -1,7 +1,8 @@
-import type { Project, ProjectCreate, User } from "@config-vault/shared";
+import type { Project, ProjectCreate, ProjectUpdate, User } from "@config-vault/shared";
 import ProjectRepository from "../repository/project-repository.js";
 import ApiError from "../utils/error.js";
 import status from "http-status";
+import { removeUndefinedValues } from "../utils/type-helpers.js";
 
 class ProjectService {
     private readonly projectRepository: ProjectRepository;
@@ -31,13 +32,14 @@ class ProjectService {
         return project;
     }
 
-    public async updateProject(id: string, data: Partial<Project>): Promise<Project> {
+    public async updateProject(id: string, data: ProjectUpdate): Promise<Project> {
         const isProjectExist = await this.projectRepository.findById(id);
         if (!isProjectExist) {
             throw new ApiError("Project not found", status.NOT_FOUND);
         }
 
-        const project = await this.projectRepository.update(id, data);
+        const cleanData = removeUndefinedValues(data);
+        const project = await this.projectRepository.update(id, cleanData);
         return project;
     }
 

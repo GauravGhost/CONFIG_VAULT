@@ -25,7 +25,6 @@ const NewConfiguration = () => {
   const { startLoading, stopLoading } = useLoaderStore();
   const projectApi = usePrivatePostApi<Configuration>();
   
-  console.log(theme);
   const envTypeItems = environmentEnum.options.map(option => ({
     value: option,
     label: formatToSentenceCase(option)
@@ -190,6 +189,7 @@ const NewConfiguration = () => {
       }
     });
   };
+
   return (
     <div className="flex justify-center">
       <DisplayWrapper
@@ -207,6 +207,7 @@ const NewConfiguration = () => {
             content: "",
             file_type: "yaml",
             sharing_type: "private",
+            is_active: true,
             configuration_details: {
               environment: "development",
               code: "",

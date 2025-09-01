@@ -4,7 +4,7 @@ import { baseModelSchema, environmentEnum } from "./base-schema";
 export const configurationDetailSchema = baseModelSchema.extend({
     configuration_id: z.string().min(1, "Configuration ID is required"),
     environment: environmentEnum,
-    env: z.string().min(1, "Environment name is required"),
+    env: z.string().min(1, "Environment name is required").optional(),
     code: z.string().min(1, "Code is required"),
 });
 

@@ -269,6 +269,141 @@ export class SQLiteRepository<T extends BaseModel> implements IRepository<T> {
         return this.db!.get(query, params);
     }
 
+    // Find with relations using LEFT JOIN
+    async findWithRelations<R = any>(options: {
+        relations: Array<{
+            table: string;
+            alias?: string;
+            on: string;
+            columns?: string[];
+        }>;
+        where?: Partial<T>;
+        orderBy?: string;
+        limit?: number;
+        offset?: number;
+    }): Promise<R[]> {
+        this.ensureDbConnection();
+
+        // Build SELECT clause
+        const mainTableColumns = `${this.tableName}.*`;
+        const relationColumns = options.relations.map(rel => {
+            const alias = rel.alias || rel.table;
+            if (rel.columns && rel.columns.length > 0) {
+                return rel.columns.map(col => `${alias}.${col} as ${alias}_${col}`).join(', ');
+            }
+            return `${alias}.*`;
+        }).join(', ');
+
+        // Build JOIN clause
+        const joinClauses = options.relations.map(rel => {
+            const alias = rel.alias || rel.table;
+            return `LEFT JOIN ${rel.table} ${alias !== rel.table ? alias : ''} ON ${rel.on}`;
+        }).join(' ');
+
+        // Build WHERE clause
+        let whereClause = '';
+        let whereValues: any[] = [];
+        if (options.where) {
+            const { clause, values } = QueryBuilder.buildWhereClause(options.where as Record<string, any>);
+            whereClause = clause;
+            whereValues = values;
+        }
+
+        // Build ORDER BY clause
+        const orderByClause = options.orderBy ? `ORDER BY ${options.orderBy}` : '';
+
+        // Build LIMIT/OFFSET clause
+        let limitClause = '';
+        if (options.limit) {
+            limitClause = `LIMIT ${options.limit}`;
+            if (options.offset) {
+                limitClause += ` OFFSET ${options.offset}`;
+            }
+        }
+
+        // Construct the full query
+        const query = `
+            SELECT ${mainTableColumns}, ${relationColumns}
+            FROM ${this.tableName}
+            ${joinClauses}
+            ${whereClause}
+            ${orderByClause}
+            ${limitClause}
+        `.trim();
+
+        const rows = await this.db!.all(query, whereValues);
+        return rows as R[];
+    }
+
+    // Transform flat rows with relations into nested structure
+    transformRelationalData<R = any>(
+        rows: any[],
+        mainKey: string = 'id',
+        relations: Array<{
+            name: string;
+            prefix: string;
+            key: string;
+            multiple?: boolean;
+        }>
+    ): R[] {
+        const resultMap = new Map<string, any>();
+
+        rows.forEach(row => {
+            const mainId = row[mainKey];
+            
+            if (!resultMap.has(mainId)) {
+                // Extract main entity data
+                const mainEntity: any = {};
+                Object.keys(row).forEach(key => {
+                    // Check if this key belongs to a relation
+                    const isRelationKey = relations.some(rel => key.startsWith(`${rel.prefix}_`));
+                    if (!isRelationKey) {
+                        mainEntity[key] = row[key];
+                    }
+                });
+
+                // Initialize relation arrays/objects
+                relations.forEach(rel => {
+                    mainEntity[rel.name] = rel.multiple ? [] : null;
+                });
+
+                resultMap.set(mainId, mainEntity);
+            }
+
+            const mainEntity = resultMap.get(mainId);
+
+            // Process relations
+            relations.forEach(rel => {
+                const relationData: any = {};
+                let hasData = false;
+
+                Object.keys(row).forEach(key => {
+                    if (key.startsWith(`${rel.prefix}_`)) {
+                        const actualKey = key.substring(rel.prefix.length + 1);
+                        relationData[actualKey] = row[key];
+                        if (row[key] !== null) hasData = true;
+                    }
+                });
+
+                if (hasData) {
+                    if (rel.multiple) {
+                        // Check if this relation item already exists
+                        const exists = mainEntity[rel.name].some((item: any) => 
+                            item[rel.key] === relationData[rel.key]
+                        );
+                        if (!exists) {
+                            mainEntity[rel.name].push(relationData);
+                        }
+                    } else {
+                        mainEntity[rel.name] = relationData;
+                    }
+                }
+            });
+        });
+
+        return Array.from(resultMap.values());
+    }
+
     // Execute database schema (CREATE TABLE statements)
     async executeSchema(schema: string): Promise<void> {
         this.ensureDbConnection();
