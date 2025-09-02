@@ -22,6 +22,15 @@ async function startServer() {
         // Initialize database and other services
         await init();
         
+        // Health check endpoint
+        app.get('/health', (req, res) => {
+            res.status(200).json({ 
+                status: 'ok', 
+                timestamp: new Date().toISOString(),
+                service: 'config-vault-server'
+            });
+        });
+        
         // API routes
         app.use('/api', routes);
         
