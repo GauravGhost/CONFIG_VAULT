@@ -7,6 +7,7 @@ import { Badge } from "@/components/ui/badge"
 import { Input } from "@/components/ui/input"
 import { ScrollArea } from "@/components/ui/scroll-area"
 import { Separator } from "@/components/ui/separator"
+import { cva, type VariantProps } from "class-variance-authority"
 import {
   Command,
   CommandEmpty,
@@ -31,6 +32,74 @@ import {
   AvatarFallback,
   AvatarImage,
 } from "@/components/ui/avatar"
+import { Icon, type IconName } from "../icon"
+
+// Variant definitions for different combobox styles
+const comboboxVariants = cva(
+  "w-full justify-between min-h-10 h-auto p-2 relative overflow-hidden transition-all duration-200",
+  {
+    variants: {
+      variant: {
+        default: "border border-input bg-background hover:bg-accent hover:text-accent-foreground",
+        minimalistic: "border-0 border-b-2 border-border rounded-none bg-transparent hover:border-primary focus-within:border-primary px-0 py-2",
+        modern: "border-2 border-input bg-background/50 hover:border-primary/50 focus-within:border-primary rounded-lg backdrop-blur-sm",
+        elegant: "border border-input bg-gradient-to-br from-background to-background/95 hover:from-accent/5 hover:to-accent/10 rounded-xl shadow-sm hover:shadow-md transition-shadow",
+        flat: "border-0 bg-muted hover:bg-muted/80 focus-within:bg-background focus-within:ring-2 focus-within:ring-ring rounded-md",
+        outlined: "border-2 border-dashed border-muted-foreground/30 bg-transparent hover:border-primary/50 focus-within:border-primary rounded-lg",
+        ghost: "border-0 bg-transparent hover:bg-accent/50 focus-within:bg-accent/20 rounded-md"
+      },
+      size: {
+        sm: "min-h-8 p-1.5 text-sm",
+        default: "min-h-10 p-2",
+        lg: "min-h-12 p-3"
+      }
+    },
+    defaultVariants: {
+      variant: "default",
+      size: "default"
+    }
+  }
+)
+
+const popoverVariants = cva(
+  "p-0",
+  {
+    variants: {
+      variant: {
+        default: "border border-border shadow-md",
+        minimalistic: "border-0 shadow-lg ring-1 ring-border/20",
+        modern: "border-2 border-primary/20 shadow-xl backdrop-blur-md bg-background/95",
+        elegant: "border border-border shadow-xl bg-gradient-to-br from-background to-background/95 backdrop-blur-sm",
+        flat: "border-0 shadow-lg bg-muted/95 backdrop-blur-sm",
+        outlined: "border-2 border-dashed border-muted-foreground/30 shadow-lg",
+        ghost: "border-0 shadow-xl bg-background/90 backdrop-blur-md"
+      }
+    },
+    defaultVariants: {
+      variant: "default"
+    }
+  }
+)
+
+const badgeVariants = cva(
+  "inline-flex items-center gap-1 px-2 py-1 text-xs font-medium transition-colors",
+  {
+    variants: {
+      variant: {
+        default: "bg-secondary text-secondary-foreground hover:bg-secondary/80",
+        minimalistic: "bg-transparent border border-border text-foreground hover:bg-accent",
+        modern: "bg-primary/10 text-primary border border-primary/20 hover:bg-primary/20",
+        elegant: "bg-gradient-to-r from-secondary to-secondary/80 text-secondary-foreground hover:from-secondary/80 hover:to-secondary/60 shadow-sm",
+        flat: "bg-muted text-muted-foreground hover:bg-muted/80",
+        outlined: "bg-transparent border-2 border-dashed border-muted-foreground/50 text-foreground hover:border-primary/50",
+        ghost: "bg-accent/20 text-accent-foreground hover:bg-accent/40"
+      }
+    },
+    defaultVariants: {
+      variant: "default"
+    }
+  }
+)
 
 export type ComboboxItem = {
   value: string
@@ -63,11 +132,12 @@ export interface FormCreateConfig {
 
 export type CreateConfig = SimpleCreateConfig | FormCreateConfig
 
-interface MyComboboxProps {
+interface MyComboboxProps extends VariantProps<typeof comboboxVariants> {
   items: ComboboxItem[]
   value?: string | string[]
   onValueChange?: (value: string | string[]) => void
   placeholder?: string
+  triggerIcon?: IconName
   searchPlaceholder?: string
   emptyText?: string
   className?: string
@@ -96,6 +166,7 @@ export function MyCombobox({
   searchPlaceholder = "Search...",
   emptyText = "No results found.",
   className,
+  triggerIcon = "ChevronsUpDown",
   disabled = false,
   allowCreate = false,
   createConfig,
@@ -111,6 +182,8 @@ export function MyCombobox({
   clearAllText = "Clear All",
   onItemsChange,
   showClearAll = true,
+  variant = "default",
+  size = "default",
 }: Readonly<MyComboboxProps>) {
   const [open, setOpen] = React.useState(false)
   const [searchValue, setSearchValue] = React.useState("")
@@ -136,11 +209,10 @@ export function MyCombobox({
   }, [localItems])
 
   const filteredItems = React.useMemo(() => {
-    const itemsToFilter = searchValue ? localItems : localItems
-    if (!searchValue) return itemsToFilter
+    if (!searchValue) return localItems
 
     const search = searchValue.toLowerCase()
-    return itemsToFilter.filter(item =>
+    return localItems.filter(item =>
       item.label.toLowerCase().includes(search) ||
       item.value.toLowerCase().includes(search) ||
       item.description?.toLowerCase().includes(search)
@@ -327,7 +399,7 @@ export function MyCombobox({
   )
 
   const getBadgeVariantClasses = () => {
-    return "bg-secondary text-secondary-foreground hover:bg-secondary/80"
+    return badgeVariants({ variant })
   }
 
   const defaultRenderTrigger = (selectedItems: ComboboxItem[], placeholder: string) => {
@@ -335,7 +407,7 @@ export function MyCombobox({
       return (
         <div className="flex items-center justify-between w-full">
           <span className="text-muted-foreground">{placeholder}</span>
-          <ChevronsUpDown className="h-4 w-4 shrink-0 opacity-50" />
+          <Icon name={triggerIcon} className="h-4 w-4 shrink-0 opacity-50" />
         </div>
       )
     }
@@ -392,7 +464,7 @@ export function MyCombobox({
                 <Separator orientation="vertical" className="h-4" />
               </>
             )}
-            <ChevronsUpDown className="h-4 w-4 opacity-50" />
+            <Icon name={triggerIcon} className="h-4 w-4 shrink-0 opacity-50" />
           </div>
         </div>
       )
@@ -403,7 +475,7 @@ export function MyCombobox({
         <div className="flex-1 min-w-0">
           {renderSelectedItem ? renderSelectedItem(selectedItems[0]) : defaultRenderSelectedItem(selectedItems[0])}
         </div>
-        <ChevronsUpDown className="h-4 w-4 shrink-0 opacity-50" />
+        <Icon name={triggerIcon} className="h-4 w-4 shrink-0 opacity-50" />
       </div>
     )
   }
@@ -435,11 +507,11 @@ export function MyCombobox({
       <Popover open={open} onOpenChange={setOpen}>
         <PopoverTrigger asChild>
           <Button
-            variant="outline"
+            variant={variant === "default" ? "outline" : "ghost"}
             aria-expanded={open}
             disabled={disabled}
             className={cn(
-              "w-full justify-between min-h-10 h-auto p-2",
+              comboboxVariants({ variant, size }),
               selectedItems.length === 0 && "text-muted-foreground",
               className
             )}
@@ -448,21 +520,31 @@ export function MyCombobox({
           </Button>
         </PopoverTrigger>
         <PopoverContent
-          className="p-0"
+          className={cn(popoverVariants({ variant }))}
           align="start"
           sideOffset={4}
           style={{ width: 'var(--radix-popover-trigger-width)', minWidth: '200px' }}
         >
           <Command shouldFilter={false} className="w-full">
             {showSearch && (
-              <div className="flex items-center border-b px-3">
+              <div className={cn(
+                "flex items-center px-3",
+                variant === "minimalistic" ? "border-b border-border/50" : "border-b"
+              )}>
                 <Search className="mr-2 h-4 w-4 shrink-0 opacity-50" />
                 <Input
                   placeholder={searchPlaceholder}
                   value={searchValue}
                   onChange={(e) => setSearchValue(e.target.value)}
                   onKeyDown={handleInputKeyDown}
-                  className="border-0 focus-visible:ring-0 focus-visible:ring-offset-0 h-10"
+                  className={cn(
+                    "border-0 focus-visible:ring-0 focus-visible:ring-offset-0 h-10",
+                    variant === "minimalistic" && "bg-transparent px-0",
+                    variant === "modern" && "bg-background/50",
+                    variant === "elegant" && "bg-gradient-to-r from-background to-background/95",
+                    variant === "flat" && "bg-muted/50",
+                    variant === "ghost" && "bg-transparent"
+                  )}
                 />
               </div>
             )}
@@ -507,8 +589,14 @@ export function MyCombobox({
                           onSelect={() => !isDisabled && handleSelect(item.value)}
                           disabled={Boolean(isDisabled)}
                           className={cn(
-                            "flex items-center gap-2 px-4 py-2",
-                            isDisabled && "opacity-50 cursor-not-allowed"
+                            "flex items-center gap-2 px-4 py-2 transition-colors",
+                            isDisabled && "opacity-50 cursor-not-allowed",
+                            variant === "minimalistic" && "hover:bg-accent/50 rounded-none",
+                            variant === "modern" && "hover:bg-primary/5 rounded-md mx-1",
+                            variant === "elegant" && "hover:bg-gradient-to-r hover:from-accent/20 hover:to-accent/10 rounded-lg mx-1",
+                            variant === "flat" && "hover:bg-muted/80 rounded-sm",
+                            variant === "outlined" && "hover:bg-accent/30 rounded-md border-l-2 border-l-transparent hover:border-l-primary/50",
+                            variant === "ghost" && "hover:bg-accent/40 rounded-md"
                           )}
                         >
                           <div className="flex-1 min-w-0">
