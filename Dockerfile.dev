@@ -1,0 +1,22 @@
+# Development Dockerfile
+FROM node:20-alpine
+
+WORKDIR /app
+
+# Install dependencies
+COPY package.json package-lock.json ./
+COPY client/package.json ./client/
+COPY server/package.json ./server/
+COPY shared/package.json ./shared/
+
+RUN npm ci
+
+# Copy source code
+COPY . .
+
+# Build shared package first
+RUN npm run build:shared
+
+EXPOSE 3000 4000
+
+CMD ["npm", "run", "dev"]
