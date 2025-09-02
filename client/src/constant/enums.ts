@@ -28,8 +28,8 @@ export const colorTheme = {
     },
     gray: {
         text: "text-gray-800 dark:text-gray-300",
-        bg: "bg-gray-100 dark:bg-gray-900/20",
-        mix: "bg-gray-100 text-gray-800 dark:bg-gray-900/20 dark:text-gray-300"
+        bg: "bg-gray-100 dark:bg-gray-700/20",
+        mix: "bg-gray-100 text-gray-800 dark:bg-gray-700/20 dark:text-gray-300"
     }
 }
 
