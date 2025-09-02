@@ -1,4 +1,4 @@
-import type { Configuration, ConfigurationCreate, ConfigurationDetailCreate, ConfigurationUpdate, ConfigurationWithDetailCreate, ConfigurationWithDetailCreateBackend } from "@config-vault/shared";
+import type { ConfigurationUpdate, ConfigurationWithDetailCreateBackend } from "@config-vault/shared";
 import ConfigurationRepository from "../repository/configuration-repository";
 import ApiError from "../utils/error";
 import status from "http-status";
@@ -58,7 +58,7 @@ class ConfigurationService {
                 columns: ['id', 'environment', 'env', 'code', 'created_at', 'updated_at']
             }],
             where: { project_id: projectId },
-            orderBy: 'configurations.created_at DESC, cd.environment ASC'
+            orderBy: 'configurations.created_at ASC, cd.environment ASC'
         });
 
         // Transform the flat rows into nested structure
@@ -108,6 +108,19 @@ class ConfigurationService {
         }
 
         await this.configurationRepository.delete(id);
+    }
+
+    // Configuration Detail methods
+    public async createConfigurationDetail(data: any) {
+        return await this.configurationDetailService.createConfigurationDetail(data);
+    }
+
+    public async updateConfigurationDetail(id: string, data: any) {
+        return await this.configurationDetailService.updateConfigurationDetail(id, data);
+    }
+
+    public async deleteConfigurationDetail(id: string) {
+        return await this.configurationDetailService.deleteConfigurationDetail(id);
     }
 }
 

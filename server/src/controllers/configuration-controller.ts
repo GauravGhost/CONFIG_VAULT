@@ -74,6 +74,37 @@ class ConfigurationController {
         res.status(status.NO_CONTENT).json(successResponse);
     }
 
+    // Configuration Detail methods
+    public createConfigurationDetail = async (req: Request, res: Response): Promise<void> => {
+        const detailData = req.body;
+        const newDetail = await this.configurationService.createConfigurationDetail(detailData);
+        successResponse.data = newDetail;
+        successResponse.message = "Configuration detail created successfully";
+        res.status(status.CREATED).json(successResponse);
+    }
+
+    public updateConfigurationDetail = async (req: Request, res: Response): Promise<void> => {
+        const { id } = req.params;
+        if (!id) {
+            throw new ApiError("Configuration detail ID is required", status.BAD_REQUEST);
+        }
+        const detailData = req.body;
+        const updatedDetail = await this.configurationService.updateConfigurationDetail(id, detailData);
+        successResponse.data = updatedDetail;
+        successResponse.message = "Configuration detail updated successfully";
+        res.status(200).json(successResponse);
+    }
+
+    public deleteConfigurationDetail = async (req: Request, res: Response): Promise<void> => {
+        const { id } = req.params;
+        if (!id) {
+            throw new ApiError("Configuration detail ID is required", status.BAD_REQUEST);
+        }
+        await this.configurationService.deleteConfigurationDetail(id);
+        successResponse.message = "Configuration detail deleted successfully";
+        res.status(status.NO_CONTENT).json(successResponse);
+    }
+
 }
 
 export default ConfigurationController;

@@ -9,7 +9,6 @@ router.getAsync('/:id', checkUserAuth, configurationController.getConfigurationB
 router.getAsync('/project/:projectId', checkUserAuth, configurationController.getConfigurationsByProjectId);
 router.getAsync('/:id/details', checkUserAuth, configurationController.getConfigurationByProjectIdWithDetails);
 router.postAsync('/', checkUserAuth, configurationController.createConfiguration);
-router.getAsync('/:id', checkUserAuth, configurationController.getConfigurationById);
 router.putAsync('/:id', checkUserAuth, configurationController.updateConfiguration);
 router.deleteAsync('/:id', checkUserAuth, configurationController.deleteConfiguration);
 

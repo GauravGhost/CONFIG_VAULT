@@ -30,5 +30,11 @@ export const endpoints = {
         create: `${API_BASE_URL}/configurations`,
         update: (id: string) => `${API_BASE_URL}/configurations/${id}`,
         delete: (id: string) => `${API_BASE_URL}/configurations/${id}`,
+    },
+    configurationDetails: {
+        create: `${API_BASE_URL}/configuration-details`,
+        update: (id: string) => `${API_BASE_URL}/configuration-details/${id}`,
+        delete: (id: string) => `${API_BASE_URL}/configuration-details/${id}`,
+
     }
 };
