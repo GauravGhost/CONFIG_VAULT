@@ -154,3 +154,5 @@ Thumbs.db
 # Yarn
 .yarn/
 .pnp.*
+.env.development
+.env.production
