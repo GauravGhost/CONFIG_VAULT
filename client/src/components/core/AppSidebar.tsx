@@ -10,13 +10,11 @@ import {
   SidebarMenuSub,
   SidebarMenuSubButton,
   SidebarMenuSubItem,
+  SidebarTrigger,
   useSidebar,
 } from "@/components/ui/sidebar";
 import { useCallback, useMemo, useState, memo, useEffect } from "react";
 import { useNavigate, useLocation } from "react-router";
-import { storage } from "@/lib/storage";
-import { ShowAlert } from "../ui/my-alert/my-alert";
-import { toast } from "sonner";
 import Text from "../ui/text";
 import { useSidebarItems } from "@/routes/sidebarMapping";
 import { Icon, type IconName } from "../ui/icon";
@@ -203,7 +201,7 @@ function AppSidebar() {
   const { state, setOpenMobile } = useSidebar();
   const [expandedItems, setExpandedItems] = useState<string[]>([]);
   const [openPopovers, setOpenPopovers] = useState<Record<string, boolean>>({});
-  const sidebarItems = useSidebarItems();
+  const { sidebarItems, footerActions } = useSidebarItems();
 
   const typewriterConfig = useMemo(() => ({
     text: "CONFIG VAULT",
@@ -254,21 +252,6 @@ function AppSidebar() {
     [navigate, setOpenMobile]
   );
 
-  const handleLogout = useCallback(async () => {
-    const confirmed = await ShowAlert({
-      title: "Logout",
-      description: "Are you sure you want to logout?",
-      confirmText: "Logout",
-      cancelText: "Cancel",
-      isDangerous: true,
-    });
-
-    if (confirmed) {
-      storage.remove("AUTH_TOKEN");
-      navigate("/login");
-      toast.success("Logout Successfully");
-    }
-  }, [navigate]);
   const logoComponent = useMemo(
     () => (
       <Icon name="Vault" />
@@ -350,22 +333,36 @@ function AppSidebar() {
     [filteredSidebarItems, toggleExpand, isActive, isExpanded, handleNavigate, state, openPopovers]
   );
 
-  const logoutButton = useMemo(
+  const footerActionButtons = useMemo(
+    () =>
+      footerActions.map((action) => (
+        <SidebarMenuItem key={action.title}>
+          <SidebarMenuButton
+            asChild
+            className={`cursor-pointer ${
+              action.variant === "destructive" ? "hover:text-destructive" : ""
+            }`}
+            onClick={action.onClick}
+          >
+            <div className="flex items-center gap-4">
+              <Icon name={action.icon} className="h-4 w-4 min-h-4 min-w-4" />
+              <Text>{action.title}</Text>
+            </div>
+          </SidebarMenuButton>
+        </SidebarMenuItem>
+      )),
+    [footerActions]
+  );
+
+  const sidebarTriggerButton = useMemo(
     () => (
       <SidebarMenuItem>
-        <SidebarMenuButton
-          asChild
-          className="cursor-pointer"
-          onClick={handleLogout}
-        >
-          <div className="flex items-center gap-4">
-            <Icon name="LogOut" className="h-4 w-4 min-h-4 min-w-4" />
-            <Text>Logout</Text>
-          </div>
-        </SidebarMenuButton>
+        <div className="flex items-center gap-2">
+          <SidebarTrigger />
+        </div>
       </SidebarMenuItem>
     ),
-    [handleLogout]
+    []
   );
 
   return (
@@ -389,7 +386,10 @@ function AppSidebar() {
         </SidebarGroup>
       </SidebarContent>
       <SidebarFooter>
-        <SidebarMenu>{logoutButton}</SidebarMenu>
+        <SidebarMenu>
+          {sidebarTriggerButton}
+          {footerActionButtons}
+        </SidebarMenu>
       </SidebarFooter>
     </Sidebar>
   );
