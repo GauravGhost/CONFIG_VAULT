@@ -14,7 +14,7 @@ import {
   useSidebar,
 } from "@/components/ui/sidebar";
 import { useCallback, useMemo, useState, memo, useEffect } from "react";
-import { useNavigate, useLocation } from "react-router";
+import { useNavigate, useLocation, Link } from "react-router";
 import Text from "../ui/text";
 import { useSidebarItems } from "@/routes/sidebarMapping";
 import { Icon, type IconName } from "../ui/icon";
@@ -251,11 +251,14 @@ function AppSidebar() {
     },
     [navigate, setOpenMobile]
   );
-
+  
+  const { toggleSidebar } = useSidebar();
   const logoComponent = useMemo(
-    () => (
-      <Icon name="Vault" />
-    ),
+    () => {
+      return (
+          <Icon name="Vault" onClick={toggleSidebar} />
+      );
+    },
     [state]
   );
 
@@ -339,9 +342,8 @@ function AppSidebar() {
         <SidebarMenuItem key={action.title}>
           <SidebarMenuButton
             asChild
-            className={`cursor-pointer ${
-              action.variant === "destructive" ? "hover:text-destructive" : ""
-            }`}
+            className={`cursor-pointer ${action.variant === "destructive" ? "hover:text-destructive" : ""
+              }`}
             onClick={action.onClick}
           >
             <div className="flex items-center gap-4">
@@ -364,18 +366,19 @@ function AppSidebar() {
     ),
     []
   );
-
   return (
     <Sidebar collapsible="icon">
-      <div className="flex gap-4 p-4">
+      <div className="flex gap-4 p-3 py-3">
         {logoComponent}
         {state !== "collapsed" && (
-          <Text
-            variant="h4"
-            className="min-w-0 font-mono"
-          >
-            {titleText}
-          </Text>
+          <Link to="/">
+            <Text
+              variant="h4"
+              className="min-w-0 font-mono"
+            >
+              {titleText}
+            </Text>
+          </Link>
         )}
       </div>
       <SidebarContent>
