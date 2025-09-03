@@ -19,10 +19,9 @@ import { colorTheme } from '@/constant/enums';
 import Text from '@/components/ui/text';
 import EditConfigurationName from './EditConfigurationName';
 import MyCombobox from '@/components/ui/my-combobox/MyCombobox';
-import useLoaderStore from '@/store/useLoaderStore';
 import { toast } from 'sonner';
 import { ShowAlert } from '@/components/ui/my-alert/my-alert';
-import useProjectsStore from '@/store/useProjectsStore';
+import ConfigurationActionButton from './ConfigurationActionButton';
 
 const ENVIRONMENTS: Environment[] = environmentEnum.options.map(env => env);
 const DEFAULT_EDITOR_OPTIONS = {
@@ -96,53 +95,6 @@ const EditorPanel: React.FC<EditorPanelProps> = ({
         </div>
     </div>
 );
-
-const ConfigurationActionButton = () => {
-    const { id } = useParams<{ id: string }>();
-    const navigate = useNavigate();
-    const { refreshProjects, getProjects } = useProjectsStore();
-    const projectApi = usePrivateDeleteApi();
-    const handleDelete = async () => {
-        const confirmed = await ShowAlert({
-            title: "Delete Project",
-            description: "Are you sure you want to delete this project? This action cannot be undone.",
-            confirmText: "Delete",
-            cancelText: "Cancel",
-            isDangerous: true,
-        });
-        if (confirmed && id) {
-            await projectApi.deleteData(endpoints.projects.delete(id));
-            if (projectApi.error) {
-                toast.error(projectApi.error ?? "Something went wrong");
-            } else {
-                await refreshProjects();
-                const projects = await getProjects();
-                if (projects) {
-                    console.log(projects);
-                    projects.length > 0 ? navigate(`/projects/${projects[0]?.id}`) : navigate(`/projects/create`);
-                }
-                toast.success("Project deleted successfully");
-            }
-        }
-
-    };
-
-    return (
-        <div className='flex gap-4'>
-            <Button
-                variant="outline"
-                onClick={() => navigate(`/projects/${id}/configuration/create`)}
-            >
-                <Icon name='Plus' />
-                {/* <Text>New Configuration</Text> */}
-            </Button>
-            <Button variant={"outline"} onClick={handleDelete}>
-                <Icon name='Trash' className={colorTheme.red.text} />
-                {/* <Text>Delete Project</Text> */}
-            </Button>
-        </div>
-    );
-};
 
 const PreviewConfiguration = () => {
     const { id } = useParams<{ id: string }>();
