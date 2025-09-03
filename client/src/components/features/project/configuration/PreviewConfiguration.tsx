@@ -22,6 +22,7 @@ import MyCombobox from '@/components/ui/my-combobox/MyCombobox';
 import useLoaderStore from '@/store/useLoaderStore';
 import { toast } from 'sonner';
 import { ShowAlert } from '@/components/ui/my-alert/my-alert';
+import useProjectsStore from '@/store/useProjectsStore';
 
 const ENVIRONMENTS: Environment[] = environmentEnum.options.map(env => env);
 const DEFAULT_EDITOR_OPTIONS = {
@@ -99,14 +100,47 @@ const EditorPanel: React.FC<EditorPanelProps> = ({
 const ConfigurationActionButton = () => {
     const { id } = useParams<{ id: string }>();
     const navigate = useNavigate();
+    const { refreshProjects, getProjects } = useProjectsStore();
+    const projectApi = usePrivateDeleteApi();
+    const handleDelete = async () => {
+        const confirmed = await ShowAlert({
+            title: "Delete Project",
+            description: "Are you sure you want to delete this project? This action cannot be undone.",
+            confirmText: "Delete",
+            cancelText: "Cancel",
+            isDangerous: true,
+        });
+        if (confirmed && id) {
+            await projectApi.deleteData(endpoints.projects.delete(id));
+            if (projectApi.error) {
+                toast.error(projectApi.error ?? "Something went wrong");
+            } else {
+                await refreshProjects();
+                const projects = await getProjects();
+                if (projects) {
+                    console.log(projects);
+                    projects.length > 0 ? navigate(`/projects/${projects[0]?.id}`) : navigate(`/projects/create`);
+                }
+                toast.success("Project deleted successfully");
+            }
+        }
+
+    };
 
     return (
-        <Button
-            variant="outline"
-            onClick={() => navigate(`/projects/${id}/configuration/create`)}
-        >
-            <Icon name='Plus' />
-        </Button>
+        <div className='flex gap-4'>
+            <Button
+                variant="outline"
+                onClick={() => navigate(`/projects/${id}/configuration/create`)}
+            >
+                <Icon name='Plus' />
+                {/* <Text>New Configuration</Text> */}
+            </Button>
+            <Button variant={"outline"} onClick={handleDelete}>
+                <Icon name='Trash' className={colorTheme.red.text} />
+                {/* <Text>Delete Project</Text> */}
+            </Button>
+        </div>
     );
 };
 
@@ -115,7 +149,7 @@ const PreviewConfiguration = () => {
     const { data, loading, fetch } = usePrivateGetApi<ConfigurationWithDetail[]>();
     const isMobile = useIsMobile();
     const [activeConfigurationId, setActiveConfigurationId] = useState<string>('');
-
+    const navigate = useNavigate();
     const handleRefresh = useCallback(async () => {
         if (!id) return;
         await fetch(endpoints.configurations.getByIdWithDetails(id));
@@ -157,7 +191,18 @@ const PreviewConfiguration = () => {
         [data, handleRefresh, handleEditorDidMount, isMobile]);
 
     if (loading) return <Loader fullScreen />;
-    if (!data?.length) return <div className="flex items-center justify-center h-screen">No configurations found</div>;
+    if (!data?.length) return (
+        <div className="flex items-center justify-center h-screen">
+            <div className='flex flex-col justify-center gap-3'>
+                <Text variant='h3'>No configurations found</Text>
+
+                <Button variant="outline" onClick={() => navigate(`/projects/${id}/configuration/create`)}>
+                    <Icon name='Plus' />
+                    <Text>Create your First Configuration</Text>
+                </Button>
+            </div>
+        </div>
+    );
 
     return (
         <div className="h-screen w-full flex flex-col">
