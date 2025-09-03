@@ -1,7 +1,7 @@
 import MarkdownViewer from '@/components/editor/MarkdownViewer';
 import { Loader } from '@/components/ui/loader';
 import { ResizableHandle, ResizablePanel, ResizablePanelGroup } from '@/components/ui/resizable';
-import { usePrivateGetApi, usePrivatePostApi, usePrivatePutApi } from '@/hooks/useApi';
+import { usePrivateDeleteApi, usePrivateGetApi, usePrivatePostApi, usePrivatePutApi } from '@/hooks/useApi';
 import { useIsMobile } from '@/hooks/use-mobile';
 import { endpoints } from '@/lib/endpoints';
 import { environmentEnum, fileTypeEnum, type ConfigurationWithDetail, type Environment, type FileType } from '@config-vault/shared';
@@ -19,6 +19,9 @@ import { colorTheme } from '@/constant/enums';
 import Text from '@/components/ui/text';
 import EditConfigurationName from './EditConfigurationName';
 import MyCombobox from '@/components/ui/my-combobox/MyCombobox';
+import useLoaderStore from '@/store/useLoaderStore';
+import { toast } from 'sonner';
+import { ShowAlert } from '@/components/ui/my-alert/my-alert';
 
 const ENVIRONMENTS: Environment[] = environmentEnum.options.map(env => env);
 const DEFAULT_EDITOR_OPTIONS = {
@@ -177,7 +180,7 @@ const ConfigurationContent: React.FC<ConfigurationContentProps> = ({
     onRefresh
 }) => {
     const [isOpen, setIsOpen] = useState(false);
-
+    const deleteConfigurationApi = usePrivateDeleteApi();
     // Initialize with first non-empty environment or default to development
     const getInitialEnvironment = useCallback((): Environment => {
         const hasContent = (detail: any) => detail && (detail.code || detail.env);
@@ -252,7 +255,6 @@ const ConfigurationContent: React.FC<ConfigurationContentProps> = ({
             setHasUnsavedChanges(false);
             setIsEditing(false);
 
-            // Store current environment before refresh
             const currentEnv = selectedEnvironment;
             await onRefresh();
             setSelectedEnvironment(currentEnv);
@@ -260,6 +262,26 @@ const ConfigurationContent: React.FC<ConfigurationContentProps> = ({
             console.error('Failed to save configuration detail:', error);
         }
     }, [hasUnsavedChanges, currentDetail, putData, postData, content, selectedEnvironment, configuration, fileType, onRefresh]);
+
+    const handleDelete = useCallback(async () => {
+        const confirmed = await ShowAlert({
+            title: "Delete Configuration",
+            description: "Are you sure you want to delete this configuration file? This action cannot be undone.",
+            confirmText: "Delete",
+            cancelText: "Cancel",
+            isDangerous: true,
+        });
+        if (confirmed && configuration.id) {
+            await deleteConfigurationApi.deleteData(endpoints.configurations.delete(configuration.id));
+            if (deleteConfigurationApi.error) {
+                toast.error(deleteConfigurationApi.error ?? "Something went wrong");
+            } else {
+                onRefresh();
+                toast.success("Configuration deleted successfully");
+            }
+        }
+
+    }, [configuration, deleteConfigurationApi, onRefresh]);
 
     const handleEnvironmentChange = useCallback((value: string | string[]) => {
         if (typeof value === 'string') {
@@ -307,6 +329,12 @@ const ConfigurationContent: React.FC<ConfigurationContentProps> = ({
                 <div className='flex gap-2 items-center'>
                     <Text variant='code'>{configuration.name}</Text>
                     <EditConfigurationName open={isOpen} onRefresh={onRefresh} onOpenChange={setIsOpen} data={configuration} />
+                    <Button
+                        variant="ghost"
+                        onClick={handleDelete}
+                    >
+                        <Icon name={"Trash"} className={cn(colorTheme.red.text)} />
+                    </Button>
                     {hasUnsavedChanges && (
                         <span className="text-yellow-500 text-xs">● Unsaved changes</span>
                     )}
